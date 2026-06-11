@@ -16,7 +16,7 @@ const LYNAES_SEA_TROUT_PROFILE={
  name:'Lynæs Sommerhavørred 2,5 timer',
  startLabel:'Lynæs Havn',
  harbor:LYNAES_HARBOUR,
- targetNm:6.0,
+ targetNm:7.4,
  speedKn:2.4,
  expectedHours:2.5,
  depthRange:[3,10],
@@ -905,16 +905,19 @@ async function tryBuildLynaesSeaTroutRoute(profile){
   let route=buildChainedSeaTroutRoute(chain.points,profile,{start,focusAreas:chain.areas});
   if(!route.ok){lastMessage=route.message||lastMessage;continue;}
   let length=pathNm(route.points);
-  if(length>7.2){lastMessage=`Gyldig rute blev for lang (${length.toFixed(2)} NM). Søger kortere Lynæs-loop.`;continue;}
+  if(length>7.7){lastMessage=`Gyldig rute blev for lang (${length.toFixed(2)} NM). Søger kortere Lynæs-loop.`;continue;}
   if(length<4.6){lastMessage=`Gyldig rute blev for kort (${length.toFixed(2)} NM). Søger længere Lynæs-loop.`;continue;}
-  const lengthPenalty=Math.abs(length-profile.targetNm);
-  const timeHours=length/profile.speedKn;
-  const timePenalty=Math.abs(timeHours-profile.expectedHours)*0.8;
+  const timeBreakdown=seaTroutTimeBreakdown(route.points);
+  const lengthPenalty=Math.abs(length-profile.targetNm)*0.45;
+  const timeHours=timeBreakdown.totalHours;
+  const timePenalty=Math.abs(timeHours-profile.expectedHours)*2.2;
+  const fishingPenalty=Math.max(0,4.7-timeBreakdown.fishingNm)*1.6;
+  const transportPenalty=Math.max(0,timeBreakdown.transportNm-2.8)*0.8;
   const areaIds=new Set(chain.areas.map(a=>a.id));
   const coveragePenalty=Math.max(0,3-areaIds.size)*0.55;
   const missingSlopePenalty=areaIds.has('hundested-slope')?0:1.2;
   const trimPenalty=route.trimmedOutAndBack?2.5:0;
-  const score=lengthPenalty+timePenalty+coveragePenalty+missingSlopePenalty+trimPenalty-(chain.edgeScore||0)*0.04;
+  const score=lengthPenalty+timePenalty+fishingPenalty+transportPenalty+coveragePenalty+missingSlopePenalty+trimPenalty-(chain.edgeScore||0)*0.04;
   const candidate={...route,profile,start,anchors:chain.points,focusAreas:chain.areas,score,length,timeHours};
   if(!best||candidate.score<best.score)best=candidate;
  }
@@ -1119,22 +1122,51 @@ function applySeaTroutRoute(result){
  drawRoute(points,profile.targetDepth,`${profile.name} · ${profile.depthRange[0]}-${profile.depthRange[1]} m`,{turnPoints:anchors,direction:true});
  logRoutingSuccess(state.currentRoute,'sea-trout');
  updateRouteActionButtons();$('routeLength').textContent=`${state.currentRoute.lengthNm.toFixed(2)} NM`;
- const timeWarnings=seaTroutTimeWarnings(state.currentRoute.lengthNm);
+ const timeBreakdown=seaTroutTimeBreakdown(state.currentRoute.points);
+ const timeWarnings=seaTroutTimeWarnings(state.currentRoute.points);
  setSeaTroutPlanUi(state.currentRoute.seaTrout,[...displayWarnings,...timeWarnings]);
- const hours=Number.isFinite(timeHours)?timeHours:state.currentRoute.lengthNm/profile.speedKn;
- setStatus(`${profile.name} beregnet. ${state.currentRoute.lengthNm.toFixed(2)} NM · ca. ${hours.toFixed(1).replace('.',',')} timer ved ${String(profile.speedKn).replace('.',',')} kn · min DDM ${stats.minDepth.toFixed(1)} m.`);
+ setStatus(`${profile.name} beregnet. ${state.currentRoute.lengthNm.toFixed(2)} NM · ca. ${formatDurationHours(timeBreakdown.totalHours)} samlet · min DDM ${stats.minDepth.toFixed(1)} m.`);
 }
 function routeFocusAreas(points,profile){
  return (profile.focusAreas||[]).filter(area=>points.some(p=>pointInBounds(p,area.bounds)));
 }
-function seaTroutTimeWarnings(distanceNm){
+function seaTroutTimeWarnings(points){
  const fmt=n=>String(n.toFixed(1)).replace('.',',');
+ const breakdown=seaTroutTimeBreakdown(points);
  return[
-  `Distance: ${fmt(distanceNm)} NM`,
-  `Estimeret tid ved 2,2 knob: ${fmt(distanceNm/2.2)} timer`,
-  `Estimeret tid ved 2,4 knob: ${fmt(distanceNm/2.4)} timer`,
-  `Estimeret tid ved 2,6 knob: ${fmt(distanceNm/2.6)} timer`
+  `Distance: ${fmt(breakdown.totalNm)} NM`,
+  `Transporttid ved 5,0 knob: ${formatDurationHours(breakdown.transportHours)} (${fmt(breakdown.transportNm)} NM)`,
+  `Fisketid ved 2,4 knob: ${formatDurationHours(breakdown.fishingHours)} (${fmt(breakdown.fishingNm)} NM)`,
+  `Samlet estimeret tid: ${formatDurationHours(breakdown.totalHours)}`
  ];
+}
+function seaTroutTimeBreakdown(points){
+ const totalNm=pathNm(points);
+ const fishingNm=seaTroutSegmentNm(points,p=>p.lat>=55.925&&p.lat<=55.965&&p.lng<=11.845);
+ const transportNm=Math.max(0,totalNm-fishingNm);
+ const transportHours=transportNm/5.0;
+ const fishingHours=fishingNm/2.4;
+ return{totalNm,transportNm,fishingNm,transportHours,fishingHours,totalHours:transportHours+fishingHours};
+}
+function seaTroutSegmentNm(points,predicate){
+ let nm=0;
+ for(let i=1;i<points.length;i++){
+  const a=points[i-1],b=points[i],seg=directNm(a,b);
+  const steps=Math.max(2,Math.ceil(seg*1852/25));
+  let inside=0;
+  for(let k=0;k<steps;k++){
+   const t=(k+.5)/steps;
+   const p={lat:a.lat+(b.lat-a.lat)*t,lng:a.lng+(b.lng-a.lng)*t};
+   if(predicate(p))inside++;
+  }
+  nm+=seg*(inside/steps);
+ }
+ return nm;
+}
+function formatDurationHours(hours){
+ const minutes=Math.max(0,Math.round(hours*60));
+ const h=Math.floor(minutes/60),m=minutes%60;
+ return h?`${h} t ${String(m).padStart(2,'0')} min`:`${m} min`;
 }
 function setSeaTroutPlanUi(plan,warnings=[]){
  if($('seaTroutZone'))$('seaTroutZone').textContent=plan?.zone||'Ikke beregnet';
