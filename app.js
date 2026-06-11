@@ -10,7 +10,7 @@ const FINE_COLLISION_GRID_PATH='./data/depth-grid-ddm.json';
 const ROUTE_SMOOTHING_ENABLED=false;
 const ROUTE_SMOOTHING_VALUES=new Set(['off','normal','high']);
 const SEA_TROUT_MISSING_DATA_MESSAGE='Kan ikke beregne sikker trollingrute – mangler dybdedata for området.';
-const LYNAES_HARBOUR={lat:55.943527983316,lng:11.863674373706};
+const LYNAES_HARBOUR={lat:55.94,lng:11.875};
 const LYNAES_SEA_TROUT_PROFILE={
  id:'lynaes-summer-25',
  name:'Lynæs Sommerhavørred 2,5 timer',
@@ -19,14 +19,14 @@ const LYNAES_SEA_TROUT_PROFILE={
  targetNm:6.0,
  speedKn:2.4,
  expectedHours:2.5,
- depthRange:[3,8],
+ depthRange:[3,10],
  boatMinDepth:2,
- targetDepth:5.5,
- tolerance:1.2,
- searchBounds:{latMin:55.925,latMax:55.970,lngMin:11.815,lngMax:11.915},
+ targetDepth:6.5,
+ tolerance:1.8,
+ searchBounds:{latMin:55.925,latMax:55.985,lngMin:11.805,lngMax:11.915},
  focusAreas:[
-  {id:'hundested-slope',name:'Hundested-skrænten',priority:4.8,bounds:{latMin:55.944,latMax:55.962,lngMin:11.850,lngMax:11.908},axis:{lat:1,lng:-0.28},note:'Fisker langs den nærmeste sejlbare del af skrænten på Hundested-siden.'},
-  {id:'hundested-light',name:'Hundested Fyr',priority:4.1,bounds:{latMin:55.948,latMax:55.965,lngMin:11.835,lngMax:11.884},axis:{lat:0.72,lng:-1},note:'Vender mod Hundested Fyr-kanten uden at gå ind på lavt plateau.'},
+  {id:'hundested-slope',name:'Hundested-skrænten',priority:4.8,bounds:{latMin:55.944,latMax:55.968,lngMin:11.825,lngMax:11.862},axis:{lat:1,lng:-0.28},note:'Fisker langs den nærmeste sejlbare del af skrænten på Hundested-siden.'},
+  {id:'hundested-light',name:'Hundested Fyr',priority:4.1,bounds:{latMin:55.945,latMax:55.965,lngMin:11.830,lngMax:11.884},axis:{lat:0.72,lng:-1},note:'Vender mod Hundested Fyr-kanten uden at gå ind på lavt plateau.'},
   {id:'skansehage',name:'Skansehage',priority:3.1,bounds:{latMin:55.935,latMax:55.958,lngMin:11.815,lngMax:11.845},axis:{lat:0.25,lng:1},note:'Holder Skansehage som ydre reference uden at tvinge en lang krydsning.'},
   {id:'isefjord-mouth',name:'Isefjord-mundingen',priority:4.4,bounds:{latMin:55.930,latMax:55.960,lngMin:11.825,lngMax:11.910},axis:{lat:1,lng:0.12},note:'S-kurver over de nærmeste dybdekanter i mundingen.'}
  ]
@@ -901,15 +901,11 @@ async function tryBuildLynaesSeaTroutRoute(profile){
  const chains=buildLynaesSeaTroutChains(profile,start,areaCandidates);
  if(!chains.length)return{ok:false,message:SEA_TROUT_MISSING_DATA_MESSAGE};
  let best=null,lastMessage=SEA_TROUT_MISSING_DATA_MESSAGE;
- for(const chain of chains.slice(0,40)){
+ for(const chain of chains.slice(0,140)){
   let route=buildChainedSeaTroutRoute(chain.points,profile,{start,focusAreas:chain.areas});
   if(!route.ok){lastMessage=route.message||lastMessage;continue;}
   let length=pathNm(route.points);
-  if(length>7.2){
-   const trimmed=trimSeaTroutOutAndBack(route,profile,chain.areas);
-   if(trimmed.ok){route=trimmed;length=pathNm(route.points);}
-   else{lastMessage=`Gyldig rute blev for lang (${length.toFixed(2)} NM). Søger kortere Lynæs-loop.`;continue;}
-  }
+  if(length>7.2){lastMessage=`Gyldig rute blev for lang (${length.toFixed(2)} NM). Søger kortere Lynæs-loop.`;continue;}
   if(length<4.6){lastMessage=`Gyldig rute blev for kort (${length.toFixed(2)} NM). Søger længere Lynæs-loop.`;continue;}
   const lengthPenalty=Math.abs(length-profile.targetNm);
   const timeHours=length/profile.speedKn;
@@ -917,7 +913,8 @@ async function tryBuildLynaesSeaTroutRoute(profile){
   const areaIds=new Set(chain.areas.map(a=>a.id));
   const coveragePenalty=Math.max(0,3-areaIds.size)*0.55;
   const missingSlopePenalty=areaIds.has('hundested-slope')?0:1.2;
-  const score=lengthPenalty+timePenalty+coveragePenalty+missingSlopePenalty-(chain.edgeScore||0)*0.04;
+  const trimPenalty=route.trimmedOutAndBack?2.5:0;
+  const score=lengthPenalty+timePenalty+coveragePenalty+missingSlopePenalty+trimPenalty-(chain.edgeScore||0)*0.04;
   const candidate={...route,profile,start,anchors:chain.points,focusAreas:chain.areas,score,length,timeHours};
   if(!best||candidate.score<best.score)best=candidate;
  }
@@ -1112,17 +1109,32 @@ function routePrefixAtDistance(points,targetNm){
 }
 function applySeaTroutRoute(result){
  const {points,profile,anchors,stats,avgDepth,warnings,focusAreas,length,timeHours}=result;
- const focusNames=[...new Set((focusAreas||[]).map(a=>a.name))];
- state.lastSeaTroutPlan={zone:profile.name,profile,warnings};
+ const actualFocusAreas=routeFocusAreas(points,profile);
+ const displayWarnings=seaTroutWarnings(stats.minDepth,profile,actualFocusAreas);
+ const focusNames=[...new Set(actualFocusAreas.map(a=>a.name))];
+ state.lastSeaTroutPlan={zone:profile.name,profile,warnings:displayWarnings};
  state.start=points[0];state.end=points.at(-1);
  setStart(points[0]);setEnd(points.at(-1));
- state.currentRoute={id:'r_'+Date.now(),name:profile.name,mode:'sea-trout',depth:profile.targetDepth,minDepth:profile.boatMinDepth,actualDepth:avgDepth,points,created:new Date().toISOString(),lengthNm:pathNm(points),source:'Danmarks Dybdemodel 2024 ddm_50m.dybde · Lynæs Sommerhavørred DDM water-only A* routing',stats,seaTrout:{zone:profile.name,profileId:profile.id,startLabel:profile.startLabel,targetDistanceNm:profile.targetNm,expectedHours:profile.expectedHours,standardSpeedKn:profile.speedKn,method:profile.method,depthRange:profile.depthRange,speed:profile.speed,lureDepth:profile.lureDepth,setup:profile.setup,focusAreas:focusNames,warnings}};
+ state.currentRoute={id:'r_'+Date.now(),name:profile.name,mode:'sea-trout',depth:profile.targetDepth,minDepth:profile.boatMinDepth,actualDepth:avgDepth,points,created:new Date().toISOString(),lengthNm:pathNm(points),source:'Danmarks Dybdemodel 2024 ddm_50m.dybde · Lynæs Sommerhavørred DDM water-only A* routing',stats,seaTrout:{zone:profile.name,profileId:profile.id,startLabel:profile.startLabel,targetDistanceNm:profile.targetNm,expectedHours:profile.expectedHours,standardSpeedKn:profile.speedKn,method:profile.method,depthRange:profile.depthRange,speed:profile.speed,lureDepth:profile.lureDepth,setup:profile.setup,focusAreas:focusNames,warnings:displayWarnings}};
  drawRoute(points,profile.targetDepth,`${profile.name} · ${profile.depthRange[0]}-${profile.depthRange[1]} m`,{turnPoints:anchors,direction:true});
  logRoutingSuccess(state.currentRoute,'sea-trout');
  updateRouteActionButtons();$('routeLength').textContent=`${state.currentRoute.lengthNm.toFixed(2)} NM`;
- setSeaTroutPlanUi(state.currentRoute.seaTrout,warnings);
+ const timeWarnings=seaTroutTimeWarnings(state.currentRoute.lengthNm);
+ setSeaTroutPlanUi(state.currentRoute.seaTrout,[...displayWarnings,...timeWarnings]);
  const hours=Number.isFinite(timeHours)?timeHours:state.currentRoute.lengthNm/profile.speedKn;
  setStatus(`${profile.name} beregnet. ${state.currentRoute.lengthNm.toFixed(2)} NM · ca. ${hours.toFixed(1).replace('.',',')} timer ved ${String(profile.speedKn).replace('.',',')} kn · min DDM ${stats.minDepth.toFixed(1)} m.`);
+}
+function routeFocusAreas(points,profile){
+ return (profile.focusAreas||[]).filter(area=>points.some(p=>pointInBounds(p,area.bounds)));
+}
+function seaTroutTimeWarnings(distanceNm){
+ const fmt=n=>String(n.toFixed(1)).replace('.',',');
+ return[
+  `Distance: ${fmt(distanceNm)} NM`,
+  `Estimeret tid ved 2,2 knob: ${fmt(distanceNm/2.2)} timer`,
+  `Estimeret tid ved 2,4 knob: ${fmt(distanceNm/2.4)} timer`,
+  `Estimeret tid ved 2,6 knob: ${fmt(distanceNm/2.6)} timer`
+ ];
 }
 function setSeaTroutPlanUi(plan,warnings=[]){
  if($('seaTroutZone'))$('seaTroutZone').textContent=plan?.zone||'Ikke beregnet';
@@ -1400,6 +1412,7 @@ function validateCompleteRouteOutput(start,end,path,points,opts,search){
 }
 function nearestNavigableCell(p,opts){
  const base=latLngToCell(p);if(!base)return null;
+ if(opts?.mode==='seaTrout'&&Number.isInteger(p?.r)&&Number.isInteger(p?.c)&&cellNavigable(p.r,p.c,opts))return{r:p.r,c:p.c,score:0};
  let best=null;
  const maxR=34;
  for(let radius=0;radius<=maxR;radius++){
