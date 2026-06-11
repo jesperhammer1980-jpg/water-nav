@@ -1,3 +1,24 @@
+# WaterNav Pilot v46.0
+
+## Ændringer i v46.0
+
+Denne release erstatter de tidligere generiske Havørred-forslag med én DDM-beregnet profil: `Lynæs Sommerhavørred 2,5 timer`.
+
+### Nyt
+- TrollingMode har nu profilen `Lynæs Sommerhavørred 2,5 timer` med start/slut i Lynæs Havn, target distance ca. 6.0 NM, standardfart 2,4 knob og forventet tid ca. 2,5 timer.
+- Profilen prioriterer Hundested-skrænten, Hundested Fyr, Skansehage og Isefjord-mundingen ud fra eksisterende DDM depth/routing tiles.
+- Bådruten beregnes og valideres mod DDM-data; ingen screenshots eller hardcodede pæne rute-streger bruges som routingdata.
+- Havørred-ruten afvises, hvis der mangler DDM-data, hvis et segment rammer land/ukendt data, eller hvis ruten går under 2 m DDM-dybde.
+- Trollingfartsassistent viser aktuel fart mod målfart 2,4 knob: for langsomt under 2,2 knob, perfekt ved 2,2-2,6 knob og for hurtigt over 2,6 knob.
+- Fangstlog kan gemme fangster på GPS-position med dato/tid, fart, DDM-dybde, stangnummer, agn/farve og note.
+- Fangster vises som stjerner på kortet, og flere fangster tæt på hinanden vises som hotspots.
+
+### Testet fokus
+- DDM manifest og synlige DDM depth/contour/routing tiles.
+- `Lynæs Sommerhavørred 2,5 timer`: route source `DDM grid`, komplet rute, 6.00 NM, minimum DDM-dybde over 2 m og ingen failed tiles i standardområdet.
+- Trollingfartsassistent uden GPS og fangstlog-guard uden GPS.
+- Lokal Vercel build med DDM manifest og referenced tile-filer.
+
 # WaterNav Pilot v45.9
 
 ## Ændringer i v45.9

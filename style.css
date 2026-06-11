@@ -64,7 +64,7 @@ body.trolling-menu-open .footer{filter:none;}
 /* v43 DDM tile loading progress */
 .tileProgressOverlay{position:fixed;z-index:940;left:50%;top:92px;transform:translateX(-50%);width:min(360px,calc(100vw - 24px));background:rgba(5,23,37,.94);border:1px solid rgba(109,213,255,.32);border-radius:8px;box-shadow:0 12px 34px rgba(0,0,0,.34);padding:12px 14px;pointer-events:none}.tileProgressOverlay[hidden]{display:none}.tileProgressText{font-size:12px;font-weight:900;color:#e8fbff;margin-bottom:7px}.tileProgressTrack{height:8px;width:100%;overflow:hidden;background:rgba(255,255,255,.14);border:1px solid rgba(109,213,255,.22);border-radius:8px}.tileProgressBar{height:100%;width:0%;background:linear-gradient(90deg,#24dc86,#33e7ff);border-radius:8px;transition:width .16s ease}@media(max-width:800px){.tileProgressOverlay{top:58px}}
 
-/* v45.9 tablet plotter + sea trout mode */
+/* v46.0 tablet plotter + Lynæs sea trout mode */
 body.navigation-active .panel:not(.nav-panel-visible){transform:translateX(-370px)}
 body.navigation-active .panel.nav-panel-visible{transform:none}
 body.navigation-active .showPanel{display:block}
@@ -79,4 +79,14 @@ body.navigation-active .navInfoBox .infoRow strong{font-size:20px}
 .fishWarning{margin-top:10px;border-radius:8px;background:rgba(255,207,84,.12);border:1px solid rgba(255,207,84,.28);color:#fff2bc;padding:10px;font-size:12px;line-height:1.35}
 .route-direction-marker{background:transparent!important;border:0!important;color:#001522;font-size:24px;font-weight:900;text-shadow:0 0 4px #fff,0 0 8px #fff}
 .route-direction-marker div{width:28px;height:28px;display:flex;align-items:center;justify-content:center}
-@media(max-width:800px){body.navigation-active .topbar{left:12px;right:12px;bottom:120px;top:auto}body.navigation-active .navInfoBox{left:10px;right:10px;width:auto;grid-template-columns:auto repeat(5,1fr)}}
+@media(max-width:800px){body.navigation-active .topbar{left:12px;right:12px;bottom:120px;top:auto}body.navigation-active .navInfoBox{left:10px;right:10px;width:auto;grid-template-columns:auto repeat(6,1fr)}}
+
+/* v46.0 catch log + trolling speed assistant */
+input[type=text],input[type=number],textarea{width:100%;background:#081c2e;border:1px solid rgba(109,213,255,.25);color:white;border-radius:10px;padding:12px;font-weight:700}
+textarea{resize:vertical;min-height:74px;font:13px/1.35 Inter,system-ui,Segoe UI,Arial,sans-serif}
+.staticPlan{margin-bottom:10px}.catchPanel input,.catchPanel textarea{margin-top:7px}
+.catch-marker{background:transparent!important;border:0!important}
+.catch-marker div{width:26px;height:26px;display:flex;align-items:center;justify-content:center;color:#ffcf54;font-size:28px;font-weight:900;text-shadow:0 0 4px #07111a,0 0 8px #07111a}
+.catchCard small{line-height:1.35}
+.speedOk{color:#24dc86!important}.speedNear{color:#ffcf54!important}.speedBad{color:#ff5066!important}.speedNeutral{color:#d8e7ef!important}
+.speedAssistRow strong{font-size:16px!important;max-width:170px;white-space:normal}

@@ -8,7 +8,7 @@ const DATA_DIR = path.join(PROJECT_ROOT, 'data');
 const TILE_DIR = path.join(DATA_DIR, 'tiles');
 const DEPTH_DIR = path.join(TILE_DIR, 'depth');
 const CONTOUR_DIR = path.join(TILE_DIR, 'contours');
-const VERSION = 'v45.9';
+const VERSION = 'v46.0';
 const TILE_SIZE = 96;
 
 const REGIONS = [

@@ -4,17 +4,17 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#061827" />
-  <title>WaterNav Pilot v45.9</title>
-  <link rel="manifest" href="./manifest.json?v=45.9" />
+  <title>WaterNav Pilot v46.0</title>
+  <link rel="manifest" href="./manifest.json?v=46.0" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="./style.css?v=45.9" />
+  <link rel="stylesheet" href="./style.css?v=46.0" />
 </head>
 <body>
   <div id="map"></div>
   <aside id="panel" class="panel">
     <header class="brand">
       <div class="logo">⚓</div>
-      <div><h1>WaterNav Pilot <span>v45.9</span></h1><p>Ruteplanlægning · manifest-status · reel DDM tile-progress · TrollingMode</p></div>
+      <div><h1>WaterNav Pilot <span>v46.0</span></h1><p>Ruteplanlægning · manifest-status · reel DDM tile-progress · TrollingMode</p></div>
       <button id="collapsePanel" class="iconBtn" title="Skjul panel">☰</button>
     </header>
 
@@ -86,6 +86,19 @@
     <section>
       <h2>Gemte ruter <span id="savedCount">0</span></h2><div id="savedRoutes" class="saved"></div>
     </section>
+
+    <section class="catchPanel">
+      <h2>Fangstlog <span id="catchCount">0</span></h2>
+      <div class="grid2">
+        <label>Stangnummer<input id="catchRod" type="number" min="1" max="12" step="1" value="1" /></label>
+        <label>Agn / farve<input id="catchLure" type="text" placeholder="fx 18 g kobber/sort" maxlength="80" /></label>
+      </div>
+      <label for="catchNote">Note</label>
+      <textarea id="catchNote" rows="3" maxlength="240" placeholder="Strøm, vejr, hug, fiskestørrelse..."></textarea>
+      <button id="logCatch" type="button" class="primary">Log fangst på GPS</button>
+      <div class="kv"><span>Hotspots</span><strong id="hotspotCount">0</strong></div>
+      <div id="catchList" class="saved compactSaved"></div>
+    </section>
   </aside>
 
   <button id="showPanel" class="showPanel">☰</button>
@@ -106,23 +119,20 @@
 
     <section class="seaTroutBox">
       <h2>Havørred Trolling Mode</h2>
-      <label for="seaTroutSpecies">Fiskeriart</label>
-      <select id="seaTroutSpecies"><option value="sea-trout">Havørred</option></select>
-      <div class="grid2">
-        <div>
-          <label for="seaTroutMonth">Måned</label>
-          <select id="seaTroutMonth"><option value="june">Juni</option><option value="july">Juli</option><option value="august">August</option><option value="september">September</option></select>
-        </div>
-        <div>
-          <label for="seaTroutTime">Tidspunkt</label>
-          <select id="seaTroutTime"><option value="morning">Morgen</option><option value="day">Dag</option><option value="evening">Aften</option><option value="night">Nat</option></select>
-        </div>
+      <label for="seaTroutProfile">Profil</label>
+      <select id="seaTroutProfile"><option value="lynaes-summer-25">Lynæs Sommerhavørred 2,5 timer</option></select>
+      <div class="fishPlanCard staticPlan">
+        <div class="kv"><span>Start/slut</span><strong>Lynæs Havn</strong></div>
+        <div class="kv"><span>Target distance</span><strong>ca. 6.0 NM</strong></div>
+        <div class="kv"><span>Standardfart</span><strong>2,4 knob</strong></div>
+        <div class="kv"><span>Forventet tid</span><strong>ca. 2,5 timer</strong></div>
+        <div class="kv"><span>Dybdeprofil</span><strong>3-8 m morgen/aften</strong></div>
       </div>
       <label for="seaTroutMethod">Fiskemetode</label>
       <select id="seaTroutMethod"><option value="planer">Paravaner</option><option value="flatline">Fladline</option><option value="diver">Diver</option><option value="mixed">Blandet</option></select>
-      <button id="findSeaTroutRoute" type="button" class="primary">Find rute</button>
+      <button id="findSeaTroutRoute" type="button" class="primary">Find Lynæs-rute</button>
       <div id="seaTroutPlan" class="fishPlanCard">
-        <div class="kv"><span>Zone</span><strong id="seaTroutZone">Ikke beregnet</strong></div>
+        <div class="kv"><span>Profil</span><strong id="seaTroutZone">Ikke beregnet</strong></div>
         <div class="kv"><span>Anbefalet fart</span><strong id="seaTroutSpeed">—</strong></div>
         <div class="kv"><span>Vanddybde</span><strong id="seaTroutWaterDepth">—</strong></div>
         <div class="kv"><span>Agndybde</span><strong id="seaTroutLureDepth">—</strong></div>
@@ -228,7 +238,7 @@
         <div class="kv"><span>Kilde</span><strong id="dataSource">Ingen</strong></div>
         <div class="kv"><span>Kurver</span><strong id="contourCount">0</strong></div>
         <div class="kv"><span>Aktiv dybde</span><strong id="activeDepth">—</strong></div>
-        <p class="hint">v45.9 bruger DDM 2024 tile-manifest, depth/routing-tiles og contour-tiles genereret fra DDM-afledte filer baseret på <code>ddm_50m.dybde.tiff</code>. Appen viser manifeststatus og loader kun synlige tiles/route-tiles med progress fra den reelle tile-loader. Ingen demo-kurver, ingen live-EMODnet-fetch.</p>
+        <p class="hint">v46.0 bruger DDM 2024 tile-manifest, depth/routing-tiles og contour-tiles genereret fra DDM-afledte filer baseret på <code>ddm_50m.dybde.tiff</code>. Appen viser manifeststatus og loader kun synlige tiles/route-tiles med progress fra den reelle tile-loader. Ingen demo-kurver, ingen live-EMODnet-fetch.</p>
         <label>Importer egen lokal GeoJSON</label>
         <input id="fileImport" type="file" accept=".geojson,.json" />
       </section>
@@ -258,14 +268,15 @@
     <div class="infoTitle">Navigation</div>
     <div class="infoRow"><span>Retning</span><strong id="infoHeading">—</strong></div>
     <div class="infoRow"><span>Hastighed</span><strong id="infoSpeed">—</strong></div>
+    <div class="infoRow speedAssistRow"><span>Trollingfart</span><strong id="trollingSpeedAssist" class="speedNeutral">mål 2,4 kn</strong></div>
     <div class="infoRow"><span>ETA</span><strong id="infoEta">—</strong></div>
     <div class="infoRow"><span>Dybde</span><strong id="infoDepth">—</strong></div>
     <div class="infoRow"><span>Rute</span><strong id="infoRoute">—</strong></div>
   </div>
 
   <div class="legend"><b>DDM dybdekurver</b><div><span class="line yellow"></span>Aktiv trollingdybde</div><div><span class="line blue"></span>Andre DDM-kurver</div><div><span class="line cyan"></span>Rute</div><div><span class="line red"></span>Rød kurslinje</div></div>
-  <footer class="footer"><span id="gpsStatus">GPS: —</span><span id="posText">Position: —</span><span id="sogText">SOG: —</span><span id="cogText">COG: —</span></footer>
+  <footer class="footer"><span id="gpsStatus">GPS: —</span><span id="posText">Position: —</span><span id="sogText">SOG: —</span><span id="trollingSpeedFooter">Trollingfart: mål 2,4 kn</span><span id="cogText">COG: —</span></footer>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="./app.js?v=45.9"></script>
+  <script src="./app.js?v=46.0"></script>
 </body>
 </html>
