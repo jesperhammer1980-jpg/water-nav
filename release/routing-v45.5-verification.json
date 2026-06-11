@@ -1,0 +1,158 @@
+{
+  "version": "v45.5",
+  "generated": "2026-06-05T04:37:04.705Z",
+  "tests": [
+    {
+      "name": "Holb?k ? Isefjord",
+      "ok": true,
+      "minDepth": 1,
+      "routingSource": "DDM grid",
+      "fallbackUsed": false,
+      "gridResolutionM": 416,
+      "endpointMaxNm": 0.562,
+      "clearanceRadius": 0,
+      "routingTiles": 4,
+      "visitedCells": 252,
+      "routePoints": 59,
+      "routeDistanceNm": 16.76,
+      "startSnapNm": 0.426,
+      "endSnapNm": 0,
+      "reachedDestination": true,
+      "routeComplete": true,
+      "contiguous": true,
+      "lastDistanceNm": 0,
+      "startNode": {
+        "r": 275,
+        "c": 863,
+        "dist": 0.425690013115133
+      },
+      "destinationNode": {
+        "r": 323,
+        "c": 884,
+        "dist": 0
+      },
+      "firstPoint": {
+        "lat": 55.725,
+        "lng": 11.715
+      },
+      "lastPoint": {
+        "lat": 55.965,
+        "lng": 11.82
+      }
+    },
+    {
+      "name": "Hundested ? R?rvig",
+      "ok": true,
+      "minDepth": 1,
+      "routingSource": "DDM grid",
+      "fallbackUsed": false,
+      "gridResolutionM": 416,
+      "endpointMaxNm": 0.562,
+      "clearanceRadius": 0,
+      "routingTiles": 4,
+      "visitedCells": 57,
+      "routePoints": 15,
+      "routeDistanceNm": 3.06,
+      "startSnapNm": 0.336,
+      "endSnapNm": 0.179,
+      "reachedDestination": true,
+      "routeComplete": true,
+      "contiguous": true,
+      "lastDistanceNm": 0.179,
+      "startNode": {
+        "r": 323,
+        "c": 888,
+        "dist": 0.33604597567636385
+      },
+      "destinationNode": {
+        "r": 319,
+        "c": 874,
+        "dist": 0.17851189550106955
+      },
+      "firstPoint": {
+        "lat": 55.965,
+        "lng": 11.84
+      },
+      "lastPoint": {
+        "lat": 55.945,
+        "lng": 11.77
+      }
+    },
+    {
+      "name": "Lyn?s ? Hundested",
+      "ok": true,
+      "minDepth": 1,
+      "routingSource": "DDM grid",
+      "fallbackUsed": false,
+      "gridResolutionM": 416,
+      "endpointMaxNm": 0.562,
+      "clearanceRadius": 0,
+      "routingTiles": 4,
+      "visitedCells": 31,
+      "routePoints": 13,
+      "routeDistanceNm": 3.07,
+      "startSnapNm": 0.18,
+      "endSnapNm": 0.336,
+      "reachedDestination": true,
+      "routeComplete": true,
+      "contiguous": true,
+      "lastDistanceNm": 0.336,
+      "startNode": {
+        "r": 318,
+        "c": 894,
+        "dist": 0.180121371454049
+      },
+      "destinationNode": {
+        "r": 323,
+        "c": 888,
+        "dist": 0.33604597567636385
+      },
+      "firstPoint": {
+        "lat": 55.940000000000005,
+        "lng": 11.870000000000001
+      },
+      "lastPoint": {
+        "lat": 55.965,
+        "lng": 11.84
+      }
+    },
+    {
+      "name": "Navig?r hjem test",
+      "ok": true,
+      "minDepth": 1,
+      "routingSource": "DDM grid",
+      "fallbackUsed": false,
+      "gridResolutionM": 416,
+      "endpointMaxNm": 0.562,
+      "clearanceRadius": 0,
+      "routingTiles": 4,
+      "visitedCells": 960,
+      "routePoints": 59,
+      "routeDistanceNm": 16.94,
+      "startSnapNm": 0.336,
+      "endSnapNm": 0.426,
+      "reachedDestination": true,
+      "routeComplete": true,
+      "contiguous": true,
+      "lastDistanceNm": 0.426,
+      "startNode": {
+        "r": 323,
+        "c": 888,
+        "dist": 0.33604597567636385
+      },
+      "destinationNode": {
+        "r": 275,
+        "c": 863,
+        "dist": 0.425690013115133
+      },
+      "firstPoint": {
+        "lat": 55.965,
+        "lng": 11.84
+      },
+      "lastPoint": {
+        "lat": 55.725,
+        "lng": 11.715
+      }
+    }
+  ]
+}

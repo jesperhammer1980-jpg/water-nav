@@ -1,0 +1,59 @@
+{
+  "version": "v40.0",
+  "source": "Danmarks Dybdemodel 2024 ddm_50m.dybde.tiff",
+  "regionalGrid": {
+    "schema": "waternav-ddm-depth-grid-rle-v2",
+    "bounds": {
+      "latMin": 54.35,
+      "latMax": 58.0,
+      "lngMin": 7.4,
+      "lngMax": 16.200000000000003
+    },
+    "step": 0.005,
+    "rows": 731,
+    "cols": 1761,
+    "validCells": 395656,
+    "waterCells": 394584,
+    "minDepth": 0.0,
+    "maxDepth": 423.2
+  },
+  "samples": [
+    {
+      "name": "Hundested west channel",
+      "lat": 55.965,
+      "lng": 11.81,
+      "depth_m": 3.8
+    },
+    {
+      "name": "Lynaes west",
+      "lat": 55.935,
+      "lng": 11.82,
+      "depth_m": 2.9
+    },
+    {
+      "name": "Great Belt mid",
+      "lat": 55.33,
+      "lng": 10.95,
+      "depth_m": 5.1
+    },
+    {
+      "name": "Oresund north",
+      "lat": 56.05,
+      "lng": 12.65,
+      "depth_m": null
+    },
+    {
+      "name": "Limfjord west",
+      "lat": 56.92,
+      "lng": 8.55,
+      "depth_m": null
+    },
+    {
+      "name": "Bornholm west",
+      "lat": 55.1,
+      "lng": 14.7,
+      "depth_m": null
+    }
+  ],
+  "note": "Denmark coarse grid is sampled from the uploaded DDM GeoTIFF. Local higher-resolution grid is still used around Hundested/Lynaes/Rorvig when both route endpoints are inside that extent."
+}

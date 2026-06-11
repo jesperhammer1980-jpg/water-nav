@@ -1,0 +1,148 @@
+{
+  "version": "v45.7",
+  "generated": "2026-06-05T06:14:23.157Z",
+  "results": [
+    {
+      "name": "Holbaek/Isefjord",
+      "minDepth": 1,
+      "prepared": true,
+      "routingTiles": 4,
+      "collisionGrid": "ready",
+      "ok": false,
+      "message": "Rute krydser land/ukendt DDM-data",
+      "points": 0,
+      "distanceNm": 0,
+      "source": "DDM grid",
+      "complete": false,
+      "fallback": false,
+      "invalidSegmentIndex": 9,
+      "invalidSegmentStart": {
+        "lat": 55.735,
+        "lng": 11.75
+      },
+      "invalidSegmentEnd": {
+        "lat": 55.735,
+        "lng": 11.755
+      },
+      "invalidPoint": {
+        "lat": 55.735,
+        "lng": 11.755
+      },
+      "invalidDepth": 0.8,
+      "invalidReason": "under minimumsdybde",
+      "invalidGridSource": "DDM routing tiles",
+      "waterPathValid": false
+    },
+    {
+      "name": "Hundested/Roervig",
+      "minDepth": 1,
+      "prepared": true,
+      "routingTiles": 4,
+      "collisionGrid": "ready",
+      "ok": true,
+      "message": null,
+      "points": 17,
+      "distanceNm": 3.75,
+      "source": "DDM grid",
+      "complete": true,
+      "fallback": false,
+      "original": 17,
+      "smoothed": 17,
+      "reduction": 0,
+      "smoothingMode": "off",
+      "waterPathValid": true
+    },
+    {
+      "name": "Lynaes/Holbaek",
+      "minDepth": 1,
+      "prepared": true,
+      "routingTiles": 4,
+      "collisionGrid": "ready",
+      "ok": false,
+      "message": "Rute krydser land/ukendt DDM-data",
+      "points": 0,
+      "distanceNm": 0,
+      "source": "DDM grid",
+      "complete": false,
+      "fallback": false,
+      "invalidSegmentIndex": 32,
+      "invalidSegmentStart": {
+        "lat": 55.78,
+        "lng": 11.765
+      },
+      "invalidSegmentEnd": {
+        "lat": 55.775,
+        "lng": 11.765
+      },
+      "invalidPoint": {
+        "lat": 55.775,
+        "lng": 11.765
+      },
+      "invalidDepth": 0.6,
+      "invalidReason": "under minimumsdybde",
+      "invalidGridSource": "DDM routing tiles",
+      "waterPathValid": false
+    },
+    {
+      "name": "Holbaek/Isefjord",
+      "minDepth": 3,
+      "prepared": true,
+      "routingTiles": 4,
+      "collisionGrid": "ready",
+      "ok": false,
+      "message": "Ingen vandrute fundet med minimum 3.0 m. PrÃ¸v lavere minimumsdybde eller flyt start/slut til dybere vand.",
+      "points": 0,
+      "distanceNm": 0,
+      "source": "DDM grid",
+      "complete": false,
+      "fallback": false,
+      "waterPathValid": false
+    },
+    {
+      "name": "Hundested/Roervig",
+      "minDepth": 3,
+      "prepared": true,
+      "routingTiles": 4,
+      "collisionGrid": "ready",
+      "ok": false,
+      "message": "Rute krydser land/ukendt DDM-data",
+      "points": 0,
+      "distanceNm": 0,
+      "source": "DDM grid",
+      "complete": false,
+      "fallback": false,
+      "invalidSegmentIndex": 0,
+      "invalidSegmentStart": {
+        "lat": 55.965,
+        "lng": 11.84
+      },
+      "invalidSegmentEnd": {
+        "lat": 55.96,
+        "lng": 11.84
+      },
+      "invalidPoint": {
+        "lat": 55.962978723404255,
+        "lng": 11.84
+      },
+      "invalidDepth": null,
+      "invalidReason": "land/ukendt DDM-data",
+      "invalidGridSource": "DDM fine collision grid",
+      "waterPathValid": false
+    },
+    {
+      "name": "Lynaes/Holbaek",
+      "minDepth": 3,
+      "prepared": true,
+      "routingTiles": 4,
+      "collisionGrid": "ready",
+      "ok": false,
+      "message": "Ingen vandrute fundet med minimum 3.0 m. PrÃ¸v lavere minimumsdybde eller flyt start/slut til dybere vand.",
+      "points": 0,
+      "distanceNm": 0,
+      "source": "DDM grid",
+      "complete": false,
+      "fallback": false,
+      "waterPathValid": false
+    }
+  ]
+}

@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#061827" />
+  <title>WaterNav Pilot v45.6</title>
+  <link rel="manifest" href="./manifest.json?v=45.6" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="./style.css?v=45.6" />
+</head>
+<body>
+  <div id="map"></div>
+  <aside id="panel" class="panel">
+    <header class="brand">
+      <div class="logo">⚓</div>
+      <div><h1>WaterNav Pilot <span>v45.6</span></h1><p>Ruteplanlægning · manifest-status · reel DDM tile-progress · TrollingMode</p></div>
+      <button id="collapsePanel" class="iconBtn" title="Skjul panel">☰</button>
+    </header>
+
+    <section class="warning"><b>Vigtig sikkerhed</b><p>DDM-data er officielt bathymetri-grundlag, men appen er ikke et godkendt søkort eller sikkerhedsnavigation. Brug altid officielle søkort, lokalkendskab og gældende sejladsregler.</p></section>
+
+    <section class="quickSettingsRow mainActions">
+      <button id="navHomeMain" type="button" class="primary homePrimary" disabled>⌂ Navigér hjem</button>
+      <button id="centerGps" type="button" class="primary gpsPrimary" disabled>Centr&eacute;r GPS</button>
+      <button id="openTrolling" type="button" class="primary">🎣 Trolling-menu</button>
+      <button id="sendSuggestion" type="button" class="primary suggestionPrimary">✉ Send forslag</button>
+      <button id="openSettings" type="button" class="primary secondaryPrimary">⚙ Settings</button>
+    </section>
+
+    <section>
+      <h2>Navigation</h2>
+      <div class="modeSwitch routeModeSwitch" role="group" aria-label="Sejladstilstand">
+        <button id="modeTrolling" type="button" class="active">TrollingMode</button>
+        <button id="modeFree" type="button">Fri navigation</button>
+      </div>
+      <p id="modeHelp" class="hint">TrollingMode laver en strækning langs valgt DDM-isobath. Fri navigation laver en water-only rute efter minimumsdybde.</p>
+      <div id="freeRouteControls" class="freeRouteControls" hidden>
+        <label for="freeMinDepth">Minimumsdybde for fri navigation</label>
+        <select id="freeMinDepth">
+          <option value="1">1.0 m</option><option value="1.5">1.5 m</option><option value="2">2.0 m</option><option value="2.5">2.5 m</option><option value="3" selected>3.0 m</option><option value="4">4.0 m</option><option value="5">5.0 m</option><option value="7">7.0 m</option><option value="8">8.0 m</option><option value="10">10.0 m</option><option value="12">12.0 m</option><option value="15">15.0 m</option><option value="20">20.0 m</option>
+        </select>
+        <p id="freeModeHelp" class="hint">Fri navigation blokerer land, ukendt DDM-data og celler under valgt minimumsdybde.</p>
+      </div>
+      <div class="routeSmoothingControls">
+        <label>Ruteudjævning</label>
+        <div class="routeSmoothingOptions" role="radiogroup" aria-label="Ruteudjævning">
+          <label><input type="radio" name="routeSmoothing" value="off" /> Fra</label>
+          <label><input type="radio" name="routeSmoothing" value="normal" checked /> Normal</label>
+          <label><input type="radio" name="routeSmoothing" value="high" /> Høj</label>
+        </div>
+      </div>
+      <div class="grid2">
+        <button id="navPickStart" type="button">Vælg start</button><button id="navPickEnd" type="button">Vælg slut</button><button id="useGps" type="button">GPS som start</button><button id="centerArea" type="button">Vis Hundested</button>
+      </div>
+      <button id="makeRouteMain" class="primary">Lav trollingstrækning</button>
+      <div class="grid2"><button id="startNav" disabled>Start navigation</button><button id="stopNav" disabled>Stop navigation</button></div>
+      <div class="grid2"><button id="saveRouteMain" disabled>Gem rute</button><button id="clearRoute" class="danger">Ryd rute</button></div>
+      <div class="kv"><span>Næste punkt</span><strong id="navNext">—</strong></div>
+      <div class="kv"><span>Afstand til rute</span><strong id="navXte">—</strong></div>
+      <div class="kv"><span>ETA til 1/2/3 NM</span><strong id="navAhead">—</strong></div>
+      <div class="kv"><span>Rutelængde</span><strong id="routeLength">—</strong></div>
+      <div class="kv"><span>Aktiv rute</span><strong id="routeDebugActive">Nej</strong></div>
+      <div class="kv"><span>Route points</span><strong id="routeDebugPoints">0</strong></div>
+      <div class="kv"><span>Original route points</span><strong id="routeDebugOriginalPoints">0</strong></div>
+      <div class="kv"><span>Smoothed route points</span><strong id="routeDebugSmoothedPoints">0</strong></div>
+      <div class="kv"><span>Reduction</span><strong id="routeDebugReduction">0%</strong></div>
+      <div class="kv"><span>Distance</span><strong id="routeDebugDistance">0.00 NM</strong></div>
+      <div class="kv"><span>Routing mode</span><strong id="routeDebugMode">-</strong></div>
+      <div class="kv"><span>Routing source</span><strong id="routeDebugSource">-</strong></div>
+      <div class="kv"><span>Grid resolution</span><strong id="routeDebugResolution">-</strong></div>
+      <div class="kv"><span>Visited cells</span><strong id="routeDebugVisited">0</strong></div>
+      <div class="kv"><span>Routing tiles</span><strong id="routeDebugTiles">0</strong></div>
+      <div class="kv"><span>Route complete</span><strong id="routeDebugComplete">Nej</strong></div>
+      <div class="kv"><span>Fallback used</span><strong id="routeDebugFallback">Nej</strong></div>
+      <div class="kv"><span>Layer visible</span><strong id="routeDebugLayer">Nej</strong></div>
+      <div class="kv"><span>Routing status</span><strong id="routeDebugStatus">Ingen rute beregnet endnu</strong></div>
+      <p class="hint">Den røde kurslinje er aktiv så snart GPS/COG er klar — også uden aktiv rute. Trollingstrækningen kan vendes med én knap, når du når slutningen.</p>
+    </section>
+
+    <section>
+      <h2>Gemte ruter <span id="savedCount">0</span></h2><div id="savedRoutes" class="saved"></div>
+    </section>
+  </aside>
+
+  <button id="showPanel" class="showPanel">☰</button>
+
+  <section class="trollingCard" aria-label="Trolling-menu">
+    <div class="trollingHeader"><h2>Trolling-menu</h2><button id="closeTrolling" type="button" class="iconBtn">✕</button></div>
+    <p id="trollingHelp" class="hint">Vælg start og slut for den strækning, der skal fiskes frem og tilbage på. Menuen lukker ved kortvalg, så punktet kan sættes direkte på kortet.</p>
+
+    <label id="depthLabel">Trollingdybde / isobath</label>
+    <select id="targetDepth">
+      <option value="1">1.0 m</option><option value="1.5">1.5 m</option><option value="2">2.0 m</option><option value="2.5">2.5 m</option><option value="3" selected>3.0 m</option><option value="4">4.0 m</option><option value="5">5.0 m</option><option value="7">7.0 m</option><option value="8">8.0 m</option><option value="10">10.0 m</option><option value="12">12.0 m</option><option value="15">15.0 m</option><option value="20">20.0 m</option>
+    </select>
+    <div id="depthControls" class="compactDepthControls">
+      <label id="toleranceLabel">Tolerance / nærmeste kurve</label>
+      <select id="depthTolerance"><option value="0.15">Eksakt/nærmeste ±0.15 m</option><option value="0.35" selected>±0.35 m</option><option value="0.75">±0.75 m</option><option value="1.5">±1.5 m</option></select>
+      <p id="depthModeHelp" class="hint">TrollingMode følger DDM-isobath omkring 3.0 m.</p>
+    </div>
+
+    <div class="grid2">
+      <button id="pickStart" type="button">Vælg start</button><button id="pickEnd" type="button">Vælg slut</button>
+    </div>
+    <button id="makeRoute" class="primary">Lav trollingstrækning</button>
+    <div class="grid2"><button id="startTrolling" disabled>Start trolling</button><button id="stopTrolling" disabled>Stop trolling</button></div>
+    <button id="reverseRoute" class="reverseBtn" disabled>↔ Vend retning / sejl tilbage</button>
+    <div class="grid2"><button id="saveRoute" disabled>Gem trollingrute</button><button id="chooseTrollingRoute" type="button">Vælg trollingrute</button></div>
+    <div id="savedTrollingRoutes" class="saved compactSaved" hidden></div>
+  </section>
+
+  <div id="routeNameOverlay" class="routeNameOverlay" hidden>
+    <div class="routeNameDialog" role="dialog" aria-modal="true" aria-labelledby="routeNameTitle">
+      <h2 id="routeNameTitle">Gem rute</h2>
+      <label for="routeNameInput">Rutenavn</label>
+      <input id="routeNameInput" type="text" autocomplete="off" maxlength="80">
+      <div class="grid2"><button id="cancelRouteSave" type="button">Annuller</button><button id="confirmRouteSave" type="button" class="primary">Gem</button></div>
+    </div>
+  </div>
+
+  <div id="settingsOverlay" class="settingsOverlay" hidden>
+    <div class="settingsPanel" role="dialog" aria-modal="true" aria-label="Settings">
+      <header class="settingsHeader"><h2>Settings</h2><button id="closeSettings" type="button" class="iconBtn">✕</button></header>
+
+      <section>
+        <h2>Kortorientering</h2>
+        <div class="orientationSwitch" role="group" aria-label="Kortorientering">
+          <button id="orientationNorth" type="button" class="active">Nord op</button>
+          <button id="orientationCourse" type="button">Sejlretning op</button>
+        </div>
+        <p id="orientationHelp" class="hint">Nord op er standard. Sejlretning op roterer kortet efter COG, når GPS-kurs er kendt.</p>
+      </section>
+
+
+      <section>
+        <h2>Alarmer</h2>
+        <div class="settingsChecks">
+          <label><input id="toggleDepthAlarm" type="checkbox" checked /> Advar ved for lav dybde på rute/GPS</label>
+          <label><input id="toggleOffRouteAlarm" type="checkbox" checked /> Advar hvis du kommer for langt fra ruten</label>
+        </div>
+        <p class="hint">Alarmerne bruger DDM-grid og aktiv rute. De er hjælp til fiskeri/navigation, ikke sikkerhedsgodkendte alarmer.</p>
+      </section>
+
+      <section>
+        <h2>Hjemhavn</h2>
+        <div class="kv"><span>Gemt hjemhavn</span><strong id="homeText">Ikke gemt</strong></div>
+        <div class="grid2">
+          <button id="saveHomeGps" type="button">Gem GPS som hjemhavn</button>
+          <button id="pickHome" type="button">Vælg hjemhavn på kort</button>
+        </div>
+        <button id="navHome" type="button" class="primary" disabled>Navigér hjem</button>
+        <p class="hint">Navigér hjem sætter aktuel GPS/kortcentrum som start og hjemhavnen som destination. Brug derefter Lav rute, så water-only routing stadig respekterer valgt dybde.</p>
+      </section>
+
+      <section>
+        <h2>Kortlag</h2>
+        <div class="settingsChecks">
+          <label><input id="toggleSea" type="checkbox" checked /> Sømærker</label>
+          <label><input id="toggleContours" type="checkbox" checked /> DDM/vector-kurver</label>
+        </div>
+        <button id="loadLocalContours" class="primary">Genindlæs synlige DDM tiles</button>
+      </section>
+
+      <section>
+        <h2>Kortområder</h2>
+        <div class="kv"><span>Manifest</span><strong id="manifestStatus">DDM manifest: indlæser...</strong></div>
+        <div class="kv"><span>Forventet sti</span><strong id="manifestPath">./data/tiles/ddm-tile-manifest.json</strong></div>
+        <div class="kv"><span>Depth tiles</span><strong id="manifestDepthCount">0</strong></div>
+        <div class="kv"><span>Contour tiles</span><strong id="manifestContourCount">0</strong></div>
+        <div class="kv"><span>Tile-cache</span><strong id="tileCacheStatus">0 depth / 0 contour</strong></div>
+        <div class="kv"><span>DDM manifest</span><strong id="ddmDebugManifest">venter</strong></div>
+        <div class="kv"><span>Debug depth tiles</span><strong id="ddmDebugDepthTiles">0</strong></div>
+        <div class="kv"><span>Debug contour tiles</span><strong id="ddmDebugContourTiles">0</strong></div>
+        <div class="kv"><span>Loaded</span><strong id="ddmDebugLoaded">0</strong></div>
+        <div class="kv"><span>Failed</span><strong id="ddmDebugFailed">0</strong></div>
+        <div class="kv"><span>Sidste fejl</span><strong id="ddmDebugLastError">Ingen</strong></div>
+        <pre id="ddmTileErrorList" class="tileErrorList">Ingen tile-fejl</pre>
+        <div id="mapRegions" class="regionList"></div>
+        <button id="refreshMapTiles" type="button" class="primary">Opdater synligt område</button>
+        <p class="hint">Installerede områder vises fra DDM tile-manifestet. Download område er forberedt som UI-flow, men ingen offline-pakker hentes endnu.</p>
+      </section>
+
+      <section>
+        <h2>Data</h2>
+        <div class="kv"><span>Kilde</span><strong id="dataSource">Ingen</strong></div>
+        <div class="kv"><span>Kurver</span><strong id="contourCount">0</strong></div>
+        <div class="kv"><span>Aktiv dybde</span><strong id="activeDepth">—</strong></div>
+        <p class="hint">v45.6 bruger DDM 2024 tile-manifest, depth/routing-tiles og contour-tiles genereret fra DDM-afledte filer baseret på <code>ddm_50m.dybde.tiff</code>. Appen viser manifeststatus og loader kun synlige tiles/route-tiles med progress fra den reelle tile-loader. Ingen demo-kurver, ingen live-EMODnet-fetch.</p>
+        <label>Importer egen lokal GeoJSON</label>
+        <input id="fileImport" type="file" accept=".geojson,.json" />
+      </section>
+
+
+      <section>
+        <h2>Brugerdata / backup</h2>
+        <div class="grid2">
+          <button id="exportUserData" type="button">Eksportér brugerdata</button>
+          <button id="importUserDataBtn" type="button">Importér brugerdata</button>
+        </div>
+        <input id="userDataImport" type="file" accept=".json" hidden />
+        <p class="hint">Eksporterer hjemhavn, gemte ruter, kortorientering og TrollingMode-indstillinger. Brugerdata gemmes med stabile storage-keys og slettes ikke af app-cache ved opdatering.</p>
+      </section>
+
+      <section><h2>Datakreditering</h2><p class="hint">Bathymetri: Danmarks Dybdemodel 2024 / Geodatastyrelsen via Dataforsyningen. CC BY 4.0. Dybdekurver er afledt fra DDM 50 m grid.</p></section>
+    </div>
+  </div>
+
+  <div class="topbar"><strong id="statusText">Klar.</strong></div>
+  <div id="tileProgress" class="tileProgressOverlay" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" hidden>
+    <div id="tileProgressText" class="tileProgressText">Indlæser DDM-kortdata: 0%</div>
+    <div class="tileProgressTrack"><div id="tileProgressBar" class="tileProgressBar"></div></div>
+  </div>
+  <div id="orientationBadge" class="orientation-badge">Nord op</div>
+  <div id="navInfoBox" class="navInfoBox" aria-live="polite">
+    <div class="infoTitle">Navigation</div>
+    <div class="infoRow"><span>Retning</span><strong id="infoHeading">—</strong></div>
+    <div class="infoRow"><span>Hastighed</span><strong id="infoSpeed">—</strong></div>
+    <div class="infoRow"><span>ETA</span><strong id="infoEta">—</strong></div>
+  </div>
+
+  <div class="legend"><b>DDM dybdekurver</b><div><span class="line yellow"></span>Aktiv trollingdybde</div><div><span class="line blue"></span>Andre DDM-kurver</div><div><span class="line cyan"></span>Rute</div><div><span class="line red"></span>Rød kurslinje</div></div>
+  <footer class="footer"><span id="gpsStatus">GPS: —</span><span id="posText">Position: —</span><span id="sogText">SOG: —</span><span id="cogText">COG: —</span></footer>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="./app.js?v=45.6"></script>
+</body>
+</html>

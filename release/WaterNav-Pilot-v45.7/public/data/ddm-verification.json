@@ -1,0 +1,109 @@
+{
+  "bbox": [
+    11.55,
+    55.82,
+    12.1,
+    56.1
+  ],
+  "samples": [
+    {
+      "name": "Hundested west outer water",
+      "lon": 11.82,
+      "lat": 55.97,
+      "depth_min": 3.664813756942749,
+      "depth_median": 4.862029075622559,
+      "depth_max": 5.164169788360596,
+      "valid_cells": 81
+    },
+    {
+      "name": "Hundested harbor entrance",
+      "lon": 11.855,
+      "lat": 55.962,
+      "depth_min": null,
+      "depth_median": null,
+      "depth_max": null,
+      "valid_cells": 0
+    },
+    {
+      "name": "Lynaes west shore",
+      "lon": 11.828,
+      "lat": 55.938,
+      "depth_min": 3.233400583267212,
+      "depth_median": 5.435297012329102,
+      "depth_max": 8.208316802978516,
+      "valid_cells": 81
+    },
+    {
+      "name": "Lynaes deeper SW",
+      "lon": 11.8,
+      "lat": 55.925,
+      "depth_min": 5.7737202644348145,
+      "depth_median": 8.670610427856445,
+      "depth_max": 9.971549034118652,
+      "valid_cells": 81
+    },
+    {
+      "name": "Rorvig north water",
+      "lon": 11.765,
+      "lat": 55.952,
+      "depth_min": null,
+      "depth_median": null,
+      "depth_max": null,
+      "valid_cells": 0
+    },
+    {
+      "name": "Ferry/channel west",
+      "lon": 11.735,
+      "lat": 55.96,
+      "depth_min": 0.16882047057151794,
+      "depth_median": 0.48217830061912537,
+      "depth_max": 1.6516315937042236,
+      "valid_cells": 10
+    },
+    {
+      "name": "Isefjord entrance mid",
+      "lon": 11.83,
+      "lat": 55.93,
+      "depth_min": 2.2470359802246094,
+      "depth_median": 4.884476661682129,
+      "depth_max": 7.731817245483398,
+      "valid_cells": 81
+    },
+    {
+      "name": "Tømmerup coast close",
+      "lon": 11.845,
+      "lat": 55.952,
+      "depth_min": 0.2922390103340149,
+      "depth_median": 1.5387802124023438,
+      "depth_max": 2.6800923347473145,
+      "valid_cells": 81
+    },
+    {
+      "name": "North open water",
+      "lon": 11.8,
+      "lat": 56.02,
+      "depth_min": 8.395872116088867,
+      "depth_median": 8.843660354614258,
+      "depth_max": 9.519466400146484,
+      "valid_cells": 81
+    }
+  ],
+  "feature_count": 1578,
+  "v26_water_routing_grid": {
+    "source": "Danmarks Dybdemodel 2024 ddm_50m.dybde.tiff",
+    "bounds": {
+      "latMin": 55.8,
+      "latMax": 56.079999999999345,
+      "lngMin": 11.52,
+      "lngMax": 12.07999999999969
+    },
+    "rows": 281,
+    "cols": 561,
+    "step": 0.001,
+    "validCells": 96510,
+    "waterCells": 94404,
+    "minDepth": 0.0,
+    "maxDepth": 21.09,
+    "routingRule": "Cells with nodata/land or depth < 0.4 m are blocked. Routes are validated by resampling every ~45 m along drawn segments."
+  }
+}

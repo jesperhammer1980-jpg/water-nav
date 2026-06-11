@@ -1,0 +1,25 @@
+{
+  "name": "WaterNav Pilot v45.9",
+  "short_name": "WaterNav",
+  "start_url": "./index.html?v=45.9",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "background_color": "#061827",
+  "theme_color": "#061827",
+  "description": "Marine navigation using DDM 2024 tile manifest diagnostics, real tile-loader progress, depth-aware water-only A* routing, and Havørred Trolling Mode.",
+  "icons": [
+    {
+      "src": "./icons/waternav-192.png?v=45.9",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/waternav-512.png?v=45.9",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
