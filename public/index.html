@@ -23,6 +23,7 @@
     <section class="quickSettingsRow mainActions">
       <button id="navHomeMain" type="button" class="primary homePrimary" disabled>⌂ Navigér hjem</button>
       <button id="centerGps" type="button" class="primary gpsPrimary" disabled>Centr&eacute;r GPS</button>
+      <button id="followGps" type="button" class="primary gpsPrimary" disabled>Følg GPS</button>
       <button id="openTrolling" type="button" class="primary">🎣 Trolling-menu</button>
       <button id="sendSuggestion" type="button" class="primary suggestionPrimary">✉ Send forslag</button>
       <button id="openSettings" type="button" class="primary secondaryPrimary">⚙ Settings</button>
@@ -60,6 +61,9 @@
       <div class="kv"><span>Afstand til rute</span><strong id="navXte">—</strong></div>
       <div class="kv"><span>ETA til 1/2/3 NM</span><strong id="navAhead">—</strong></div>
       <div class="kv"><span>Rutelængde</span><strong id="routeLength">—</strong></div>
+      <div class="kv"><span>Follow GPS</span><strong id="followGpsState">Ikke aktiv</strong></div>
+      <div class="kv"><span>GPS updates modtaget</span><strong id="gpsUpdateCount">0</strong></div>
+      <div class="kv"><span>Seneste panTo/flyTo</span><strong id="lastAutoPan">-</strong></div>
       <div class="kv"><span>Aktiv rute</span><strong id="routeDebugActive">Nej</strong></div>
       <div class="kv"><span>Route points</span><strong id="routeDebugPoints">0</strong></div>
       <div class="kv"><span>Original route points</span><strong id="routeDebugOriginalPoints">0</strong></div>
@@ -81,6 +85,16 @@
       <div class="kv"><span>Invalid depth</span><strong id="routeDebugInvalidDepth">-</strong></div>
       <div class="kv"><span>Routing status</span><strong id="routeDebugStatus">Ingen rute beregnet endnu</strong></div>
       <p class="hint">Den røde kurslinje er aktiv så snart GPS/COG er klar — også uden aktiv rute. Trollingstrækningen kan vendes med én knap, når du når slutningen.</p>
+    </section>
+
+    <section>
+      <h2>Spor</h2>
+      <div class="grid2"><button id="startTrack" type="button">Start spor</button><button id="stopTrack" type="button" disabled>Stop spor</button></div>
+      <div class="grid2"><button id="saveTrack" type="button" disabled>Gem spor</button><button id="clearTrack" type="button" disabled>Ryd spor</button></div>
+      <div class="kv"><span>Status</span><strong id="trackStatus">Stoppet</strong></div>
+      <div class="kv"><span>Distance</span><strong id="trackDistance">0.00 NM</strong></div>
+      <div class="kv"><span>Tid</span><strong id="trackDuration">0 min</strong></div>
+      <div class="kv"><span>Gns. fart</span><strong id="trackAvgSpeed">—</strong></div>
     </section>
 
     <section>
