@@ -59,6 +59,7 @@ body.trolling-menu-open .footer{filter:none;}
 .regionList{display:flex;flex-direction:column;gap:8px;margin-top:10px}.regionCard{display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(255,255,255,.055);border:1px solid rgba(109,213,255,.16);border-radius:8px;padding:10px}.regionCard strong{display:block;color:#fff;font-size:13px}.regionCard small{display:block;color:#b9d5e4;font-size:12px;line-height:1.35;margin-top:2px}.regionCard button{flex:0 0 auto;padding:8px 9px;border-radius:8px;font-size:12px;background:#173045;color:#d7edf8}
 .tileErrorList{margin:10px 0 0;max-height:180px;overflow:auto;white-space:pre-wrap;background:rgba(255,80,102,.08);border:1px solid rgba(255,80,102,.22);border-radius:8px;padding:10px;color:#ffe8ed;font:12px/1.35 ui-monospace,SFMono-Regular,Consolas,monospace}
 #routeDebugStatus{max-width:190px;white-space:normal}
+#ddmCurrentDepth,#ddmDepthError,#ddmGpsPosition,#lastAutoPan{max-width:190px;white-space:normal}
 .routeSmoothingControls{margin:10px 0 0}.routeSmoothingControls>label{margin:0 0 7px}.routeSmoothingOptions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.routeSmoothingOptions label{display:flex;align-items:center;justify-content:center;gap:6px;margin:0;background:#081c2e;border:1px solid rgba(109,213,255,.22);border-radius:8px;padding:9px 6px;color:#fff;font-weight:800}.routeSmoothingOptions input{width:auto}
 
 /* v43 DDM tile loading progress */
