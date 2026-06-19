@@ -266,16 +266,19 @@ function applyMapOrientation(force=false){
  if(target>180)target-=360;
  if(rotate&&Number.isFinite(state.mapRotationDeg))target=state.mapRotationDeg+angleDeltaDeg(state.mapRotationDeg,target);
  const wasRotating=document.body.classList.contains('course-up-active');
- if(!force&&rotate===wasRotating&&Math.abs(target-state.mapRotationDeg)<0.5){updateOrientationText();return;}
+ const sizeModeChanged=rotate!==wasRotating;
+ if(!force&&!sizeModeChanged&&Math.abs(target-state.mapRotationDeg)<0.5){updateOrientationText();return;}
+ document.body.classList.toggle('course-up-active',rotate);
+ if(sizeModeChanged)map.invalidateSize({animate:false,pan:false});
  state.mapRotationDeg=target;
  document.documentElement.style.setProperty('--waternav-map-rotation',`${rotate?target:0}deg`);
  document.documentElement.style.setProperty('--waternav-counter-rotation',`${rotate?-target:0}deg`);
- const size=map.getSize();
+ const rotationCenter=visibleMapPoint(.5,.5);
  for(const name of panes){
   const pane=map.getPane(name);
   if(!pane)continue;
   pane.classList.toggle('course-up-rotating',rotate);
-  pane.style.transformOrigin=`${size.x/2}px ${size.y/2}px`;
+  pane.style.transformOrigin=`${rotationCenter.x}px ${rotationCenter.y}px`;
   pane.style.transform=rotate?`rotate(${target}deg)`:'';
  }
  const popupPane=map.getPane('popupPane');
@@ -284,9 +287,19 @@ function applyMapOrientation(force=false){
   popupPane.style.transformOrigin='';
   popupPane.style.transform='';
  }
-  document.body.classList.toggle('course-up-active',rotate);
  updateOrientationText();
- if(force)requestAnimationFrame(()=>map.invalidateSize(false));
+ if(force||sizeModeChanged)requestAnimationFrame(()=>{
+  map.invalidateSize({animate:false,pan:false});
+  scheduleVisibleTileUpdate();
+  if(state.followGpsActive)followBoat(true);
+ });
+}
+
+function visibleMapPoint(xRatio,yRatio){
+ const rect=map.getContainer().getBoundingClientRect();
+ const viewportW=window.innerWidth||document.documentElement.clientWidth||rect.width;
+ const viewportH=window.innerHeight||document.documentElement.clientHeight||rect.height;
+ return L.point(viewportW*xRatio-rect.left,viewportH*yRatio-rect.top);
 }
 
 
@@ -374,8 +387,8 @@ function followBoat(force=false){
  panMapTo(center,'auto-follow',{immediate:true,guardMs:900});
 }
 function followGpsTargetPoint(size){
- const center=L.point(size.x/2,size.y/2);
- const desired=L.point(size.x*.5,size.y*FOLLOW_GPS_Y_RATIO);
+ const center=visibleMapPoint(.5,.5);
+ const desired=visibleMapPoint(.5,FOLLOW_GPS_Y_RATIO);
  const shouldCounterRotate=state.orientationMode==='course'&&Number.isFinite(state.lastCog)&&Number.isFinite(state.mapRotationDeg)&&Math.abs(state.mapRotationDeg)>0.001;
  if(!shouldCounterRotate)return desired;
  const angle=-state.mapRotationDeg*Math.PI/180;
