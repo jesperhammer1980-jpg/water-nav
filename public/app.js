@@ -1,5 +1,5 @@
 ﻿'use strict';
-const VERSION='v46.1';
+const VERSION='v46.2';
 const TILE_MANIFEST_PATH='./data/tiles/ddm-tile-manifest.json';
 const MAX_DEPTH_TILES=180;
 const MAX_CONTOUR_TILES=36;
@@ -44,7 +44,7 @@ const USER_SETTINGS_KEY='waternav.userSettings.v1';
 const OLD_ROUTE_KEYS=['waternav.routes.v34','waternav.routes.v33','waternav.routes.v32','waternav.routes.v31','waternav.routes.v30'];
 const OLD_ORIENTATION_KEYS=['waternav.orientation.v34','waternav.orientation.v33','waternav.orientation.v32','waternav.orientation.v31'];
 const OLD_HOME_KEYS=['waternav.homePort.v34','waternav.homePort.v33','waternav.homePort.v32','waternav.homePort.v31'];
-const state={pickMode:null,start:null,end:null,gps:null,lastSogKn:null,lastCog:null,prevGps:null,contours:[],activeContours:[],routeLayer:null,routeLine:null,routeBounds:null,startMarker:null,endMarker:null,currentRoute:null,pendingRouteSave:null,savedRoutes:[],catchLogs:[],depthGrid:null,localDepthGrid:null,denmarkDepthGrid:null,depthGridSource:'tiles',collisionGrid:null,collisionGridStatus:'idle',collisionGridError:null,tileManifest:null,manifestStatus:'idle',manifestError:null,tileById:new Map(),loadedDepthTiles:new Map(),loadingDepthTiles:new Map(),loadedContourTiles:new Map(),loadingContourTiles:new Map(),visibleTileIds:new Set(),routingTileIds:new Set(),tileUpdateTimer:null,tileProgress:null,tileProgressSeq:0,lastTileLoadError:null,tileErrors:[],failedTileCount:0,lastTileError:null,lastDepthProbe:null,routeSmoothing:'off',routeSmoothingUserSelected:false,routeDebug:{lastStatus:'Ingen rute beregnet endnu',lastError:null,pointCount:0,distanceNm:0,layerVisible:false,routingMode:'-',routingSource:'-',gridResolutionM:0,visitedCells:0,routingTileCount:0,fallbackUsed:false,reachedDestination:false,routeComplete:false,lastDistanceNm:0,startNode:null,destinationNode:null,lastPoint:null,originalPointCount:0,smoothedPointCount:0,smoothingReductionPct:0,smoothingMode:'off',smoothingSplineUsed:false,smoothingFallback:false,invalidSegmentIndex:null,invalidSegmentStart:null,invalidSegmentEnd:null,invalidPoint:null,invalidDepth:null,invalidReason:null},contourLayerGroup:L.layerGroup(),catchLayerGroup:L.layerGroup(),hotspotLayerGroup:L.layerGroup(),trackLayerGroup:L.layerGroup(),boatMarker:null,homeMarker:null,forwardLayer:L.layerGroup(),navActive:false,trollingEnabled:true,depthAlarm:true,offRouteAlarm:true,keepAwakeDuringNavigation:true,wakeLock:null,wakeLockStatus:'Ikke aktiv',fullscreenStatus:'Ikke aktiv',orientationMode:'north',mapRotationDeg:0,homePort:null,trollingDirection:1,lastSeaTroutPlan:null,gpsUpdateCount:0,followGpsActive:false,followGpsPausedByUser:false,lastAutoPanText:'-',autoPanGuardUntil:0,longPressTimer:null,longPressStart:null,suppressNextMapClickUntil:0,trackActive:false,trackAutoResume:true,trackAutoPaused:false,trackPoints:[],trackStartedAt:null,trackStoppedAt:null,savedTracks:[]};
+const state={pickMode:null,start:null,end:null,gps:null,lastSogKn:null,lastCog:null,prevGps:null,contours:[],activeContours:[],routeLayer:null,routeLine:null,routeBounds:null,startMarker:null,endMarker:null,currentRoute:null,pendingRouteSave:null,savedRoutes:[],catchLogs:[],depthGrid:null,localDepthGrid:null,denmarkDepthGrid:null,depthGridSource:'tiles',collisionGrid:null,collisionGridStatus:'idle',collisionGridError:null,tileManifest:null,manifestStatus:'idle',manifestError:null,tileById:new Map(),loadedDepthTiles:new Map(),loadingDepthTiles:new Map(),loadedContourTiles:new Map(),loadingContourTiles:new Map(),visibleTileIds:new Set(),routingTileIds:new Set(),tileUpdateTimer:null,tileProgress:null,tileProgressSeq:0,lastTileLoadError:null,tileErrors:[],failedTileCount:0,lastTileError:null,lastDepthProbe:null,routeSmoothing:'off',routeSmoothingUserSelected:false,routeDebug:{lastStatus:'Ingen rute beregnet endnu',lastError:null,pointCount:0,distanceNm:0,layerVisible:false,routingMode:'-',routingSource:'-',gridResolutionM:0,visitedCells:0,routingTileCount:0,fallbackUsed:false,reachedDestination:false,routeComplete:false,lastDistanceNm:0,startNode:null,destinationNode:null,lastPoint:null,originalPointCount:0,smoothedPointCount:0,smoothingReductionPct:0,smoothingMode:'off',smoothingSplineUsed:false,smoothingFallback:false,invalidSegmentIndex:null,invalidSegmentStart:null,invalidSegmentEnd:null,invalidPoint:null,invalidDepth:null,invalidReason:null},contourLayerGroup:L.layerGroup(),catchLayerGroup:L.layerGroup(),hotspotLayerGroup:L.layerGroup(),trackLayerGroup:L.layerGroup(),boatMarker:null,homeMarker:null,forwardLayer:L.layerGroup(),navActive:false,trollingEnabled:true,depthAlarm:true,offRouteAlarm:true,keepAwakeDuringNavigation:true,wakeLock:null,wakeLockStatus:'Ikke aktiv',fullscreenStatus:'Ikke aktiv',orientationMode:'north',mapRotationDeg:0,homePort:null,trollingDirection:1,lastSeaTroutPlan:null,gpsUpdateCount:0,followGpsActive:false,followGpsPausedByUser:false,lastAutoPanText:'-',autoPanGuardUntil:0,longPressTimer:null,longPressStart:null,suppressNextMapClickUntil:0,trackActive:false,trackAutoResume:true,trackAutoPaused:false,trackPoints:[],trackStartedAt:null,trackStoppedAt:null,savedTracks:[],routingBusy:false};
 if(typeof window!=='undefined') window.waterNavState=state;
 const $=id=>document.getElementById(id);
 const startIcon=L.divIcon({className:'start-marker',html:'<div style="width:22px;height:22px;border-radius:50%;background:#24dc86;border:4px solid #fff;box-shadow:0 0 0 4px rgba(0,0,0,.28)"></div>',iconSize:[30,30],iconAnchor:[15,15]});
@@ -59,10 +59,10 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,kee
 const seaMarks=L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png',{maxZoom:18,keepBuffer:4,updateWhenIdle:false,updateWhenZooming:false,attribution:'OpenSeaMap'}).addTo(map);
 state.contourLayerGroup.addTo(map);state.hotspotLayerGroup.addTo(map);state.catchLayerGroup.addTo(map);state.trackLayerGroup.addTo(map);state.forwardLayer.addTo(map);
 init();
-function init(){migrateUserData();bindUI();loadUserSettings();loadSavedRoutes();renderSavedRoutes();loadCatchLogs();renderCatchLogs();loadTrackPrefs();loadSavedTracks();loadTrackDraft();renderTrackLayer();loadHomePort();loadOrientationPreference();updateManifestDependentControls();updateWakeLockStatusUi();updateFullscreenStatus();updateTrollingSpeedAssistant();updateFollowGpsUi();updateTrackUi();updateDepthDebugUi();loadTileManifest().then(()=>updateVisibleMapTiles({initial:true})).then(()=>setStatus('v46.1 klar. DDM tiles loader dynamisk for synligt kortområde og Lynæs Sommerhavørred.')).catch(e=>{console.error(e);setStatus(manifestErrorMessage(e));});updateInfoBox();cleanupOldCaches();if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js?v=46.1').then(r=>r.update()).catch(()=>{});setTimeout(()=>{map.invalidateSize(true);applyMapOrientation(true);scheduleVisibleTileUpdate();},300)}
+function init(){migrateUserData();bindUI();loadUserSettings();loadSavedRoutes();renderSavedRoutes();loadCatchLogs();renderCatchLogs();loadTrackPrefs();loadSavedTracks();loadTrackDraft();renderTrackLayer();loadHomePort();loadOrientationPreference();updateManifestDependentControls();updateWakeLockStatusUi();updateFullscreenStatus();updateTrollingSpeedAssistant();updateFollowGpsUi();updateTrackUi();updateDepthDebugUi();updateMainRouteStatusUi();loadTileManifest().then(()=>updateVisibleMapTiles({initial:true})).then(()=>setStatus('v46.2 klar. DDM tiles loader dynamisk for synligt kortområde og Lynæs Sommerhavørred.')).catch(e=>{console.error(e);setStatus(manifestErrorMessage(e));});updateInfoBox();cleanupOldCaches();if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js?v=46.2').then(r=>r.update()).catch(()=>{});setTimeout(()=>{map.invalidateSize(true);applyMapOrientation(true);scheduleVisibleTileUpdate();},300)}
 function bindUI(){
  $('collapsePanel').onclick=()=>{const panel=$('panel');panel.classList.add('hidden');panel.classList.remove('nav-panel-visible');};$('showPanel').onclick=toggleNavigationPanel;$('openSettings').onclick=openSettings;$('closeSettings').onclick=closeSettings;$('openTrolling').onclick=openTrolling;$('closeTrolling').onclick=closeTrolling;$('settingsOverlay').onclick=e=>{if(e.target.id==='settingsOverlay')closeSettings()};$('exportUserData').onclick=exportUserData;$('importUserDataBtn').onclick=()=>$('userDataImport').click();$('userDataImport').onchange=importUserData;if($('navHomeMain'))$('navHomeMain').onclick=()=>navigateHome(true);if($('sendSuggestion'))$('sendSuggestion').onclick=sendSuggestion;
- $('modeFree').onclick=()=>setTrollingMode(false);$('modeTrolling').onclick=()=>setTrollingMode(true);$('orientationNorth').onclick=()=>setMapOrientation('north');$('orientationCourse').onclick=()=>setMapOrientation('course');$('pickStart').onclick=()=>beginMapPick('start');$('pickEnd').onclick=()=>beginMapPick('end');if($('navPickStart'))$('navPickStart').onclick=()=>beginMapPick('start');if($('navPickEnd'))$('navPickEnd').onclick=()=>beginMapPick('end');$('useGps').onclick=useGpsAsStart;if($('centerGps'))$('centerGps').onclick=centerOnGps;if($('followGps'))$('followGps').onclick=followGpsNow;if($('mapFollowGps'))$('mapFollowGps').onclick=followGpsNow;$('centerArea').onclick=()=>map.setView([55.955,11.83],12);$('saveHomeGps').onclick=saveHomeFromGps;$('pickHome').onclick=()=>beginMapPick('home');$('navHome').onclick=()=>navigateHome(true);
+ $('modeFree').onclick=()=>setTrollingMode(false);$('modeTrolling').onclick=()=>setTrollingMode(true);$('orientationNorth').onclick=()=>setMapOrientation('north');$('orientationCourse').onclick=()=>setMapOrientation('course');$('pickStart').onclick=()=>beginMapPick('start');$('pickEnd').onclick=()=>beginMapPick('end');if($('navPickStart'))$('navPickStart').onclick=()=>beginNavigationMapPick('start');if($('navPickEnd'))$('navPickEnd').onclick=()=>beginNavigationMapPick('end');$('useGps').onclick=useGpsAsStart;if($('centerGps'))$('centerGps').onclick=centerOnGps;if($('followGps'))$('followGps').onclick=followGpsNow;if($('mapFollowGps'))$('mapFollowGps').onclick=followGpsNow;$('centerArea').onclick=()=>map.setView([55.955,11.83],12);$('saveHomeGps').onclick=saveHomeFromGps;$('pickHome').onclick=()=>beginMapPick('home');$('navHome').onclick=()=>navigateHome(true);
  if($('loadLocalContours'))$('loadLocalContours').onclick=reloadVisibleTiles;if($('refreshMapTiles'))$('refreshMapTiles').onclick=reloadVisibleTiles;$('makeRoute').onclick=makeTrollingRouteFromMenu;if($('makeRouteMain'))$('makeRouteMain').onclick=makeRoute;if($('findSeaTroutRoute'))$('findSeaTroutRoute').onclick=findSeaTroutRoute;if($('logCatch'))$('logCatch').onclick=logCatchFromGps;$('saveRoute').onclick=saveCurrentRoute;if($('saveRouteMain'))$('saveRouteMain').onclick=saveCurrentRoute;if($('chooseTrollingRoute'))$('chooseTrollingRoute').onclick=toggleSavedTrollingRoutes;if($('confirmRouteSave'))$('confirmRouteSave').onclick=confirmRouteSave;if($('cancelRouteSave'))$('cancelRouteSave').onclick=closeRouteNameDialog;if($('routeNameOverlay'))$('routeNameOverlay').onclick=e=>{if(e.target.id==='routeNameOverlay')closeRouteNameDialog()};if($('routeNameInput'))$('routeNameInput').onkeydown=e=>{if(e.key==='Enter')confirmRouteSave();if(e.key==='Escape')closeRouteNameDialog()};$('clearRoute').onclick=clearRoute;$('reverseRoute').onclick=reverseCurrentRoute;$('fileImport').onchange=importGeoJsonFile;
  $('startNav').onclick=startNavigation;$('stopNav').onclick=()=>stopNavigation();if($('startTrolling'))$('startTrolling').onclick=startTrolling;if($('stopTrolling'))$('stopTrolling').onclick=()=>stopNavigation();if($('startTrack'))$('startTrack').onclick=()=>startTrackLog({manual:true});if($('stopTrack'))$('stopTrack').onclick=stopTrackLog;if($('clearTrack'))$('clearTrack').onclick=clearTrackLog;if($('saveTrack'))$('saveTrack').onclick=saveTrackLog;if($('toggleAutoTrack'))$('toggleAutoTrack').onchange=e=>setTrackAutoResume(e.target.checked);
  $('targetDepth').onchange=()=>{renderContours();updateDepthLabels();};$('depthTolerance').onchange=()=>{renderContours();updateDepthLabels();};if($('freeMinDepth'))$('freeMinDepth').onchange=updateDepthLabels;setTrollingMode(true);
@@ -118,7 +118,7 @@ function angleDeltaDeg(from,to){let d=normalizeDeg(to)-normalizeDeg(from);if(d>1
 function smoothAngleDeg(from,to,alpha){return normalizeDeg(normalizeDeg(from)+angleDeltaDeg(from,to)*alpha)}
 function updateBoatMarker(){if(!state.gps)return;if(!state.boatMarker){state.boatMarker=L.marker(state.gps,{icon:boatIcon,zIndexOffset:900}).addTo(map).bindTooltip('Din position')}else state.boatMarker.setLatLng(state.gps);const el=state.boatMarker.getElement()?.querySelector('div');if(el&&Number.isFinite(state.lastCog))el.style.transform=`rotate(${state.lastCog}deg)`}
 function toggleLayers(on,layers){layers.forEach(layer=>{if(on){if(!map.hasLayer(layer))layer.addTo(map)}else{if(map.hasLayer(layer))map.removeLayer(layer)}})}
-function setStatus(t){$('statusText').textContent=t}
+function setStatus(t){$('statusText').textContent=t;updateMainRouteStatusUi()}
 function setPickMode(m){state.pickMode=m;setStatus(m==='start'?'Klik startpunkt på kortet.':m==='end'?'Klik slutpunkt på kortet.':m==='home'?'Klik din hjemhavn på kortet.':'Klar.')}
 function openSettings(){document.body.classList.add('settings-open');$('settingsOverlay').hidden=false;setTimeout(()=>map.invalidateSize(false),120)}
 function closeSettings(){document.body.classList.remove('settings-open');$('settingsOverlay').hidden=true;setTimeout(()=>map.invalidateSize(false),120)}
@@ -130,6 +130,10 @@ function beginMapPick(mode){
  closeSettings();
  if(typeof window!=='undefined'&&window.innerWidth<=800)$('panel')?.classList.add('hidden');
  setPickMode(mode);
+}
+function beginNavigationMapPick(mode){
+ setTrollingMode(false,true);
+ beginMapPick(mode);
 }
 
 function setWakeLockStatus(status){
@@ -342,7 +346,7 @@ function updateDepthLabels(){
 
 function setStart(p){state.start={lat:p.lat,lng:p.lng};if(state.startMarker)state.startMarker.setLatLng(state.start);else state.startMarker=L.marker(state.start,{icon:startIcon,zIndexOffset:980}).addTo(map).bindPopup('Start');state.startMarker.bringToFront?.();updateRouteDebugUi();setStatus('Start valgt. Vælg slutpunkt.')}
 function setEnd(p){state.end={lat:p.lat,lng:p.lng};if(state.endMarker)state.endMarker.setLatLng(state.end);else state.endMarker=L.marker(state.end,{icon:endIcon,zIndexOffset:990}).addTo(map).bindPopup('Slut');state.endMarker.bringToFront?.();updateRouteDebugUi();setStatus(state.trollingEnabled?'Slut valgt. Lav trollingrute på DDM-dybdekurven.':'Slut valgt. Lav fri rute efter valgt dybde.')}
-function useGpsAsStart(){if(!state.gps)return setStatus('Mangler GPS-position');setStart(state.gps);panMapTo([state.gps.lat,state.gps.lng],'GPS som start')}
+function useGpsAsStart(){if(!state.gps)return setStatus('Mangler GPS-position');setTrollingMode(false,true);setStart(state.gps);panMapTo([state.gps.lat,state.gps.lng],'GPS som start')}
 function centerOnGps(){if(!state.gps)return setStatus('Mangler GPS-position');panMapTo([state.gps.lat,state.gps.lng],'Centrér GPS');setStatus('Kortet er centreret på aktuel GPS-position.');applyMapOrientation(true)}
 function followGpsNow(){if(!state.gps)return setStatus('Mangler GPS-position');enableFollowGps('Følg GPS');followBoat(true);setStatus('Følg GPS er aktiv. Kortet følger bådens GPS-position.')}
 function enableFollowGps(reason=''){
@@ -429,6 +433,38 @@ function updateFollowGpsUi(){
   if(main)main.textContent=state.followGpsActive?'Følger GPS':'Følg GPS';
   if(sub)sub.textContent=!gpsReady?'Venter på GPS':state.followGpsActive?'Aktiv':state.followGpsPausedByUser?'Pauset':'Klar';
  }
+ updateMainRouteStatusUi();
+}
+function setMainStatus(id,text,cls){
+ const el=$(id);
+ if(!el)return;
+ el.textContent=text;
+ el.classList.remove('ok','warn','bad');
+ if(cls)el.classList.add(cls);
+}
+function visibleDdmTileText(){
+ const visible=state.visibleTileIds instanceof Set?state.visibleTileIds:new Set();
+ const depth=[...visible].filter(id=>state.loadedDepthTiles.has(id)).length;
+ const contour=[...visible].filter(id=>state.loadedContourTiles.has(id)).length;
+ const depthCount=visible.size?depth:state.loadedDepthTiles.size;
+ const contourCount=visible.size?contour:state.loadedContourTiles.size;
+ return`${depthCount} depth / ${contourCount} contour`;
+}
+function mainRoutingStatus(){
+ if(state.routingBusy)return{text:'beregner',cls:'warn'};
+ if(state.routeDebug.lastError||state.manifestStatus==='error')return{text:'fejl',cls:'bad'};
+ return{text:'klar',cls:'ok'};
+}
+function updateMainRouteStatusUi(){
+ setMainStatus('mainStartStatus',state.start?'sat':'mangler',state.start?'ok':'bad');
+ setMainStatus('mainEndStatus',state.end?'sat':'mangler',state.end?'ok':'bad');
+ setMainStatus('mainGpsStatus',state.gps?'klar':'mangler',state.gps?'ok':'warn');
+ const manifestReady=!!state.tileManifest&&state.manifestStatus==='ready';
+ const manifestError=state.manifestStatus==='error';
+ setMainStatus('mainManifestStatus',manifestReady?'klar':manifestError?'fejl':'indlæser',manifestReady?'ok':manifestError?'bad':'warn');
+ setMainStatus('mainVisibleTiles',visibleDdmTileText(),state.visibleTileIds?.size?'ok':'warn');
+ const routing=mainRoutingStatus();
+ setMainStatus('mainRoutingStatus',routing.text,routing.cls);
 }
 function loadHomePort(){
  try{state.homePort=JSON.parse(localStorage.getItem(HOME_KEY)||'null')}catch{state.homePort=null}
@@ -608,19 +644,19 @@ function setManifestStatus(status,message){
  if($('manifestContourCount'))$('manifestContourCount').textContent=String(contourCount);
  setStatus(message);
  updateDdmDebugUi();
+ updateMainRouteStatusUi();
 }
 
 function updateManifestDependentControls(){
  const ready=!!state.tileManifest&&state.manifestStatus==='ready';
  setDisabled('loadLocalContours',!ready);
  setDisabled('refreshMapTiles',!ready);
- if(!ready){setDisabled('makeRoute',true);setDisabled('makeRouteMain',true);return;}
  updateRouteActionButtons();
 }
 
 function requireTileManifest(actionLabel='Denne handling'){
  if(state.tileManifest&&state.manifestStatus==='ready')return true;
- const msg=state.manifestError||`${actionLabel} kræver DDM manifest. Forventet fil: ${expectedManifestPath()}`;
+ const msg=state.manifestError||`DDM manifest ikke klar. ${actionLabel} kræver ${expectedManifestPath()}`;
  setStatus(msg);
  return false;
 }
@@ -963,11 +999,11 @@ async function prepareRoutingGrid(start,end){
  state.lastTileLoadError=null;
  state.routingTileIds=new Set();
  state.depthGrid=buildVirtualTileGrid(state.tileManifest);
- if(!pointInsideGrid(start,state.depthGrid)||!pointInsideGrid(end,state.depthGrid)){state.lastTileLoadError='Mangler DDM-data: start/slut ligger uden for installeret DDM-område.';return false;}
+ if(!pointInsideGrid(start,state.depthGrid)||!pointInsideGrid(end,state.depthGrid)){state.lastTileLoadError='Mangler DDM tiles: start/slut ligger uden for installeret DDM-område.';return false;}
  const pad=Math.min(1.1,Math.max(0.18,directNm(start,end)/120));
  const bounds=boundsFromPoints([start,end],pad);
  const tiles=tilesForBounds(bounds);
- if(!tiles.length){state.lastTileLoadError='Mangler DDM-data for ruteområdet.';return false;}
+ if(!tiles.length){state.lastTileLoadError='Mangler DDM tiles';return false;}
  const ids=new Set(tiles.map(tile=>tile.id));
  state.routingTileIds=ids;
  const tracker=hasPendingTileLoads(ids,{depth:true})?beginTileProgress():null;
@@ -1004,6 +1040,7 @@ function updateMapRegionsUi(){
  const loadedText=`${state.loadedDepthTiles.size} depth / ${state.loadedContourTiles.size} contour`;
  if($('tileCacheStatus'))$('tileCacheStatus').textContent=loadedText;
  updateDdmDebugUi();
+ updateMainRouteStatusUi();
 }
 
 function updateDdmDebugUi(){
@@ -1066,7 +1103,11 @@ function renderContours(){state.contourLayerGroup.clearLayers();state.activeCont
 function makeTrollingRouteFromMenu(){setTrollingMode(true,true);makeRoute()}
 function routeInputError(){if(!state.start)return'Mangler startpunkt';if(!state.end)return'Mangler slutpunkt';return null}
 function makeRoute(){if(!requireTileManifest('Lav rute'))return;const inputError=routeInputError();if(inputError)return handleRoutingFailure(inputError,{routingMode:state.trollingEnabled?'trolling':'free',routingSource:'DDM grid',fallbackUsed:false});clearComputedRouteOnly();setStatus('Henter DDM tiles og beregner vandrute...');setRouteBusy(true);setRoutingDebug('Beregner rute',null,0,0,{routingMode:state.trollingEnabled?'trolling':'free',routingSource:'DDM grid',fallbackUsed:false,routeComplete:false,originalPointCount:0,smoothedPointCount:0,smoothingReductionPct:0,smoothingMode:'off',smoothingSplineUsed:false,smoothingFallback:false,...clearInvalidSegmentStats()});setTimeout(async()=>{try{state.trollingEnabled?await makeTrollingRoute():await makeFreeRoute()}catch(e){console.error(e);handleRoutingFailure('Ruteberegning fejlede: '+(e?.message||e))}finally{setRouteBusy(false);updateRouteActionButtons()}},30)}
-function setRouteBusy(busy){for(const id of ['makeRoute','makeRouteMain','findSeaTroutRoute']){const el=$(id);if(el)el.disabled=!!busy||!state.tileManifest||state.manifestStatus!=='ready'}}
+function setRouteBusy(busy){
+ state.routingBusy=!!busy;
+ for(const id of ['makeRoute','makeRouteMain','findSeaTroutRoute']){const el=$(id);if(el)el.disabled=!!busy}
+ updateMainRouteStatusUi();
+}
 
 async function findSeaTroutRoute(){
  if(!requireTileManifest('Find Lynæs Sommerhavørred-rute'))return;
@@ -1426,7 +1467,7 @@ function depthRangePenalty(depth,range){return depth<range[0]?range[0]-depth:dep
 async function makeTrollingRoute(){
  const inputError=routeInputError();if(inputError)return handleRoutingFailure(inputError,{routingMode:'trolling',routingSource:'DDM grid',fallbackUsed:false});
  if(!requireTileManifest('Lav trollingrute'))return;
- if(!await prepareRoutingGrid(state.start,state.end))return handleRoutingFailure(state.lastTileLoadError||'Mangler DDM-data',{routingMode:'trolling',routingSource:'DDM grid',gridResolutionM:gridResolutionMeters(),routingTileCount:state.routingTileIds.size,fallbackUsed:false});
+ if(!await prepareRoutingGrid(state.start,state.end))return handleRoutingFailure(state.lastTileLoadError||'Mangler DDM tiles',{routingMode:'trolling',routingSource:'DDM grid',gridResolutionM:gridResolutionMeters(),routingTileCount:state.routingTileIds.size,fallbackUsed:false});
  const target=selectedDepth();
  const tolerance=selectedTolerance();
  const result=buildWaterRoute(state.start,state.end,{mode:'trolling',targetDepth:target,tolerance,minDepth:0.4});
@@ -1440,7 +1481,7 @@ async function makeTrollingRoute(){
 async function makeFreeRoute(){
  const inputError=routeInputError();if(inputError)return handleRoutingFailure(inputError,{routingMode:'free',routingSource:'DDM grid',fallbackUsed:false});
  if(!requireTileManifest('Lav fri rute'))return;
- if(!await prepareRoutingGrid(state.start,state.end))return handleRoutingFailure(state.lastTileLoadError||'Mangler DDM-data',{routingMode:'free',routingSource:'DDM grid',gridResolutionM:gridResolutionMeters(),routingTileCount:state.routingTileIds.size,fallbackUsed:false});
+ if(!await prepareRoutingGrid(state.start,state.end))return handleRoutingFailure(state.lastTileLoadError||'Mangler DDM tiles',{routingMode:'free',routingSource:'DDM grid',gridResolutionM:gridResolutionMeters(),routingTileCount:state.routingTileIds.size,fallbackUsed:false});
  const target=selectedFreeMinDepth();
  const tolerance=selectedTolerance();
  const minDepth=freeMinDepth();
@@ -1503,6 +1544,7 @@ function updateRouteDebugUi(){
  if($('routeDebugInvalidDepth'))$('routeDebugInvalidDepth').textContent=Number.isFinite(state.routeDebug.invalidDepth)?`${state.routeDebug.invalidDepth.toFixed(1)} m`:(state.routeDebug.invalidReason||'-');
  if($('routeDebugStatus'))$('routeDebugStatus').textContent=state.routeDebug.lastError||state.routeDebug.lastStatus||'Ingen';
  updateDepthDebugUi();
+ updateMainRouteStatusUi();
 }
 
 function logRoutingSuccess(route,mode){
@@ -2056,9 +2098,9 @@ function updateRouteActionButtons(){
  const manifestReady=!!state.tileManifest&&state.manifestStatus==='ready';
  const has=!!state.currentRoute?.points?.length;
  const isTrolling=['trolling','sea-trout'].includes(state.currentRoute?.mode);
- setDisabled('makeRoute',!manifestReady);
- setDisabled('makeRouteMain',!manifestReady);
- setDisabled('findSeaTroutRoute',!manifestReady);
+ setDisabled('makeRoute',state.routingBusy);
+ setDisabled('makeRouteMain',state.routingBusy);
+ setDisabled('findSeaTroutRoute',state.routingBusy);
  setDisabled('loadLocalContours',!manifestReady);
  setDisabled('refreshMapTiles',!manifestReady);
  setDisabled('startNav',!has||state.navActive);
@@ -2068,6 +2110,7 @@ function updateRouteActionButtons(){
  setDisabled('stopTrolling',!state.navActive||!isTrolling);
  setDisabled('reverseRoute',!has||!isTrolling);
  setDisabled('saveRoute',!has||!isTrolling);
+ updateMainRouteStatusUi();
 }
 function reverseCurrentRoute(){if(!state.currentRoute?.points?.length)return setStatus('Ingen rute at vende.');if(!['trolling','sea-trout'].includes(state.currentRoute.mode))return setStatus('Vend retning bruges til trollingstrækninger.');state.currentRoute.points=[...state.currentRoute.points].reverse();state.currentRoute.reversed=!state.currentRoute.reversed;state.trollingDirection=state.currentRoute.reversed?-1:1;const first=state.currentRoute.points[0],last=state.currentRoute.points[state.currentRoute.points.length-1];setStart(first);setEnd(last);const label=state.currentRoute.mode==='sea-trout'?`Havørred · ${state.currentRoute.seaTrout?.zone||'DDM'} · ${state.currentRoute.reversed?'retur':'frem'}`:`Trollingstrækning · ${state.currentRoute.depth}m · ${state.currentRoute.reversed?'retur':'frem'}`;drawRoute(state.currentRoute.points,Number(state.currentRoute.actualDepth||state.currentRoute.depth),label);logRoutingSuccess(state.currentRoute,'reverse');if(state.navActive)updateNavigation();setStatus('Trollingretning vendt. Sejl samme strækning tilbage.')}
 function startNavigation(){if(!state.currentRoute?.points?.length)return setStatus('Ingen rute at navigere efter.');state.navActive=true;enableFollowGps('navigation start');setNavigationLayout(true);updateRouteActionButtons();syncWakeLock();setStatus(state.currentRoute.mode==='trolling'||state.currentRoute.mode==='sea-trout'?'Trolling startet. Kurslinje 1/2/3 NM vises ved GPS/COG.':'Navigation startet. Kurslinje 1/2/3 NM vises ved GPS/COG.');updateNavigation();updateInfoBox();}
@@ -2473,7 +2516,7 @@ function renderSavedTrollingRoutes(){
   box.appendChild(card);
  }
 }
-async function cleanupOldCaches(){if(!('caches' in window)) return;try{const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('waternav-') && k!=='waternav-v46.1').map(k=>caches.delete(k)))}catch(e){console.warn('Cache cleanup failed',e)}}
+async function cleanupOldCaches(){if(!('caches' in window)) return;try{const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('waternav-') && k!=='waternav-v46.2').map(k=>caches.delete(k)))}catch(e){console.warn('Cache cleanup failed',e)}}
 function inferCogFromGps(prev,next){
  if(!prev||!next)return NaN;
  const dt=((next.time||Date.now())-(prev.time||Date.now()))/1000;

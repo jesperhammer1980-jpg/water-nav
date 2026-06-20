@@ -1,3 +1,21 @@
+# WaterNav Pilot v46.2
+
+## Ændringer i v46.2
+
+Denne bugfix-release retter ruteoprettelse på tablet uden nye featureområder.
+
+### Rettet
+- Hovedkortet viser nu tydelig rute-debug: startpunkt, slutpunkt, GPS, DDM manifest, synlige DDM tiles og routing status.
+- `Lav rute` er klikbar nok til at vise konkret fejl i stedet for at være tavst disabled, når manifest/start/slut mangler.
+- Hovedpanelets `Vælg start`, `Vælg slut` og `GPS som start` planlægger almindelig fri rute; Trolling-menuens egne knapper bevarer trolling-flowet.
+- Ruteoprettelse viser konkrete fejl for `Mangler startpunkt`, `Mangler slutpunkt`, `Mangler GPS-position`, `DDM manifest ikke klar`, `Mangler DDM tiles` og `Ingen sikker vandrute fundet`.
+
+### Testet fokus
+- Start-/slutmarkører via kortvalg.
+- Manuel fri DDM-rute uden GPS.
+- `Navigér hertil` guard uden GPS.
+- TrollingMode `Find Lynæs-rute`.
+
 # WaterNav Pilot v46.1
 
 ## Ændringer i v46.1
