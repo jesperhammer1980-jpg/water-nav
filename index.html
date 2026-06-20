@@ -4,17 +4,21 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#061827" />
-  <title>WaterNav Pilot v46.0</title>
-  <link rel="manifest" href="./manifest.json?v=46.0" />
+  <title>WaterNav Pilot v46.1</title>
+  <link rel="manifest" href="./manifest.json?v=46.1" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="./style.css?v=46.0" />
+  <link rel="stylesheet" href="./style.css?v=46.1" />
 </head>
 <body>
   <div id="map"></div>
+  <button id="mapFollowGps" type="button" class="mapFollowGps waiting" aria-live="polite" aria-pressed="false">
+    <span class="mapFollowGpsMain">Følg GPS</span>
+    <span class="mapFollowGpsSub">Venter på GPS</span>
+  </button>
   <aside id="panel" class="panel">
     <header class="brand">
       <div class="logo">⚓</div>
-      <div><h1>WaterNav Pilot <span>v46.0</span></h1><p>Ruteplanlægning · manifest-status · reel DDM tile-progress · TrollingMode</p></div>
+      <div><h1>WaterNav Pilot <span>v46.1</span></h1><p>Ruteplanlægning · manifest-status · reel DDM tile-progress · TrollingMode</p></div>
       <button id="collapsePanel" class="iconBtn" title="Skjul panel">☰</button>
     </header>
 
@@ -261,7 +265,7 @@
         <div class="kv"><span>Kilde</span><strong id="dataSource">Ingen</strong></div>
         <div class="kv"><span>Kurver</span><strong id="contourCount">0</strong></div>
         <div class="kv"><span>Aktiv dybde</span><strong id="activeDepth">—</strong></div>
-        <p class="hint">v46.0 bruger DDM 2024 tile-manifest, depth/routing-tiles og contour-tiles genereret fra DDM-afledte filer baseret på <code>ddm_50m.dybde.tiff</code>. Appen viser manifeststatus og loader kun synlige tiles/route-tiles med progress fra den reelle tile-loader. Ingen demo-kurver, ingen live-EMODnet-fetch.</p>
+        <p class="hint">v46.1 bruger DDM 2024 tile-manifest, depth/routing-tiles og contour-tiles genereret fra DDM-afledte filer baseret på <code>ddm_50m.dybde.tiff</code>. Appen viser manifeststatus og loader kun synlige tiles/route-tiles med progress fra den reelle tile-loader. Ingen demo-kurver, ingen live-EMODnet-fetch.</p>
         <label>Importer egen lokal GeoJSON</label>
         <input id="fileImport" type="file" accept=".geojson,.json" />
       </section>
@@ -300,6 +304,6 @@
   <div class="legend"><b>DDM dybdekurver</b><div><span class="line yellow"></span>Aktiv trollingdybde</div><div><span class="line blue"></span>Andre DDM-kurver</div><div><span class="line cyan"></span>Rute</div><div><span class="line red"></span>Rød kurslinje</div></div>
   <footer class="footer"><span id="gpsStatus">GPS: —</span><span id="posText">Position: —</span><span id="sogText">SOG: —</span><span id="trollingSpeedFooter">Trollingfart: mål 2,4 kn</span><span id="cogText">COG: —</span></footer>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="./app.js?v=46.0"></script>
+  <script src="./app.js?v=46.1"></script>
 </body>
 </html>

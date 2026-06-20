@@ -1,3 +1,21 @@
+# WaterNav Pilot v46.1
+
+## Ændringer i v46.1
+
+Denne bugfix-release fokuserer på praktisk tabletbrug uden nye featureområder.
+
+### Rettet
+- Fast `Følg GPS`-knap ligger direkte på hovedkortet og viser `Aktiv`, `Pauset` eller `Venter på GPS`.
+- Manuel pan/zoom pauser follow-state, og `Følg GPS` aktiverer igen auto-follow uden at nulstille aktiv rute, TrollingMode, hjemhavn, tracklog eller DDM tile-cache.
+- Kortklik, long press og rutevalg bruger korrekt kortpunkt i både Nord op og Sejlretning op.
+- `Navigér hertil` kræver rigtig GPS-position og viser `Mangler GPS-position` i stedet for skjult fallback fra kortcentrum.
+- `Lav rute` validerer start/slut før eksisterende rute ryddes og viser konkrete fejl som `Mangler startpunkt`, `Mangler slutpunkt`, `Mangler DDM-data` og `Ingen sikker vandrute fundet`.
+
+### Testet fokus
+- DDM manifest og synlige DDM tiles.
+- Fast `Følg GPS`-knap uden GPS og route-flow uden skjult reset.
+- Lokal Vercel build med public DDM manifest og tile-filer.
+
 # WaterNav Pilot v46.0
 
 ## Ændringer i v46.0

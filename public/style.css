@@ -41,6 +41,15 @@ body.trolling-menu-open .footer{filter:none;}
 /* v39 readable course-up overlays */
 :root{--waternav-map-rotation:0deg;--waternav-counter-rotation:0deg}
 .gpsPrimary{background:linear-gradient(180deg,#31d7ff,#0b69b8);color:#001522}
+.mapFollowGps{position:fixed;z-index:660;left:50%;bottom:54px;transform:translateX(-50%);min-width:132px;border-radius:8px;padding:10px 14px;border:1px solid rgba(255,255,255,.58);box-shadow:0 10px 28px rgba(0,0,0,.36);background:linear-gradient(180deg,#31d7ff,#0b69b8);color:#001522;text-align:left;line-height:1.1}
+.mapFollowGps:hover{filter:brightness(1.08)}
+.mapFollowGps .mapFollowGpsMain{display:block;font-size:14px;font-weight:900}
+.mapFollowGps .mapFollowGpsSub{display:block;margin-top:3px;font-size:11px;font-weight:800;opacity:.82}
+.mapFollowGps.active{background:linear-gradient(180deg,#24dc86,#0d8c52);color:#03140c;border-color:rgba(209,255,231,.85)}
+.mapFollowGps.paused{background:linear-gradient(180deg,#ffcf54,#d88400);color:#101000;border-color:rgba(255,242,188,.85)}
+.mapFollowGps.waiting{background:linear-gradient(180deg,#19384d,#0b2438);color:#dff8ff;border-color:rgba(109,213,255,.35)}
+body.navigation-active .mapFollowGps{bottom:96px}
+@media(max-width:800px){.mapFollowGps{left:auto;right:12px;bottom:108px;transform:none;min-width:118px;padding:9px 11px}.mapFollowGps .mapFollowGpsMain{font-size:13px}.mapFollowGps .mapFollowGpsSub{font-size:10px}body.navigation-active .mapFollowGps{bottom:118px}}
 .map-action-popup .leaflet-popup-content-wrapper{background:transparent;box-shadow:none;padding:0;transform:none!important;transform-origin:50% calc(100% + 14px)}
 .map-action-popup .leaflet-popup-content{margin:0}
 .map-action-popup .leaflet-popup-tip-container{display:none}
