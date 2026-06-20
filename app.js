@@ -44,7 +44,7 @@ const USER_SETTINGS_KEY='waternav.userSettings.v1';
 const OLD_ROUTE_KEYS=['waternav.routes.v34','waternav.routes.v33','waternav.routes.v32','waternav.routes.v31','waternav.routes.v30'];
 const OLD_ORIENTATION_KEYS=['waternav.orientation.v34','waternav.orientation.v33','waternav.orientation.v32','waternav.orientation.v31'];
 const OLD_HOME_KEYS=['waternav.homePort.v34','waternav.homePort.v33','waternav.homePort.v32','waternav.homePort.v31'];
-const state={pickMode:null,start:null,end:null,gps:null,lastSogKn:null,lastCog:null,prevGps:null,contours:[],activeContours:[],routeLayer:null,routeLine:null,routeBounds:null,startMarker:null,endMarker:null,currentRoute:null,pendingRouteSave:null,savedRoutes:[],catchLogs:[],depthGrid:null,localDepthGrid:null,denmarkDepthGrid:null,depthGridSource:'tiles',collisionGrid:null,collisionGridStatus:'idle',collisionGridError:null,tileManifest:null,manifestStatus:'idle',manifestError:null,tileById:new Map(),loadedDepthTiles:new Map(),loadingDepthTiles:new Map(),loadedContourTiles:new Map(),loadingContourTiles:new Map(),visibleTileIds:new Set(),routingTileIds:new Set(),tileUpdateTimer:null,tileProgress:null,tileProgressSeq:0,lastTileLoadError:null,tileErrors:[],failedTileCount:0,lastTileError:null,lastDepthProbe:null,routeSmoothing:'off',routeSmoothingUserSelected:false,routeDebug:{lastStatus:'Ingen rute beregnet endnu',lastError:null,pointCount:0,distanceNm:0,layerVisible:false,routingMode:'-',routingSource:'-',gridResolutionM:0,visitedCells:0,routingTileCount:0,fallbackUsed:false,reachedDestination:false,routeComplete:false,lastDistanceNm:0,startNode:null,destinationNode:null,lastPoint:null,originalPointCount:0,smoothedPointCount:0,smoothingReductionPct:0,smoothingMode:'off',smoothingSplineUsed:false,smoothingFallback:false,invalidSegmentIndex:null,invalidSegmentStart:null,invalidSegmentEnd:null,invalidPoint:null,invalidDepth:null,invalidReason:null},contourLayerGroup:L.layerGroup(),catchLayerGroup:L.layerGroup(),hotspotLayerGroup:L.layerGroup(),trackLayerGroup:L.layerGroup(),boatMarker:null,homeMarker:null,forwardLayer:L.layerGroup(),navActive:false,trollingEnabled:true,depthAlarm:true,offRouteAlarm:true,keepAwakeDuringNavigation:true,wakeLock:null,wakeLockStatus:'Ikke aktiv',fullscreenStatus:'Ikke aktiv',orientationMode:'north',mapRotationDeg:0,homePort:null,trollingDirection:1,lastSeaTroutPlan:null,gpsUpdateCount:0,followGpsActive:false,followGpsPausedByUser:false,lastAutoPanText:'-',autoPanGuardUntil:0,longPressTimer:null,longPressStart:null,suppressNextMapClickUntil:0,trackActive:false,trackAutoResume:true,trackAutoPaused:false,trackPoints:[],trackStartedAt:null,trackStoppedAt:null,savedTracks:[],routingBusy:false};
+const state={pickMode:null,start:null,end:null,gps:null,lastSogKn:null,lastCog:null,prevGps:null,contours:[],activeContours:[],routeLayer:null,routeLine:null,routeBounds:null,startMarker:null,endMarker:null,currentRoute:null,pendingRouteSave:null,savedRoutes:[],catchLogs:[],depthGrid:null,localDepthGrid:null,denmarkDepthGrid:null,depthGridSource:'tiles',collisionGrid:null,collisionGridStatus:'idle',collisionGridError:null,tileManifest:null,manifestStatus:'idle',manifestError:null,tileById:new Map(),loadedDepthTiles:new Map(),loadingDepthTiles:new Map(),loadedContourTiles:new Map(),loadingContourTiles:new Map(),visibleTileIds:new Set(),routingTileIds:new Set(),tileUpdateTimer:null,tileProgress:null,tileProgressSeq:0,lastTileLoadError:null,tileErrors:[],failedTileCount:0,lastTileError:null,lastDepthProbe:null,routeSmoothing:'off',routeSmoothingUserSelected:false,routeDebug:{lastStatus:'Ingen rute beregnet endnu',lastError:null,pointCount:0,distanceNm:0,layerVisible:false,routingMode:'-',routingSource:'-',gridResolutionM:0,visitedCells:0,routingTileCount:0,fallbackUsed:false,reachedDestination:false,routeComplete:false,lastDistanceNm:0,startNode:null,destinationNode:null,lastPoint:null,originalPointCount:0,smoothedPointCount:0,smoothingReductionPct:0,smoothingMode:'off',smoothingSplineUsed:false,smoothingFallback:false,invalidSegmentIndex:null,invalidSegmentStart:null,invalidSegmentEnd:null,invalidPoint:null,invalidDepth:null,invalidReason:null,invalidGridSource:null,startTile:null,endTile:null,inspectedTileCount:0,firstFailingTile:null,firstMissingTile:null,firstInvalidDepthTile:null,routingStopReason:null,tileDebug:null},contourLayerGroup:L.layerGroup(),catchLayerGroup:L.layerGroup(),hotspotLayerGroup:L.layerGroup(),trackLayerGroup:L.layerGroup(),boatMarker:null,homeMarker:null,forwardLayer:L.layerGroup(),navActive:false,trollingEnabled:true,depthAlarm:true,offRouteAlarm:true,keepAwakeDuringNavigation:true,wakeLock:null,wakeLockStatus:'Ikke aktiv',fullscreenStatus:'Ikke aktiv',orientationMode:'north',mapRotationDeg:0,homePort:null,trollingDirection:1,lastSeaTroutPlan:null,gpsUpdateCount:0,followGpsActive:false,followGpsPausedByUser:false,lastAutoPanText:'-',autoPanGuardUntil:0,longPressTimer:null,longPressStart:null,suppressNextMapClickUntil:0,trackActive:false,trackAutoResume:true,trackAutoPaused:false,trackPoints:[],trackStartedAt:null,trackStoppedAt:null,savedTracks:[],routingBusy:false};
 if(typeof window!=='undefined') window.waterNavState=state;
 const $=id=>document.getElementById(id);
 const startIcon=L.divIcon({className:'start-marker',html:'<div style="width:22px;height:22px;border-radius:50%;background:#24dc86;border:4px solid #fff;box-shadow:0 0 0 4px rgba(0,0,0,.28)"></div>',iconSize:[30,30],iconAnchor:[15,15]});
@@ -344,8 +344,13 @@ function updateDepthLabels(){
  if($('freeModeHelp'))$('freeModeHelp').textContent=`Fri navigation behandler ${freeMinDepth().toFixed(1)} m som minimumsdybde. Celler under denne dybde og naboceller mod lavt/ukendt vand blokeres.`;
 }
 
-function setStart(p){state.start={lat:p.lat,lng:p.lng};if(state.startMarker)state.startMarker.setLatLng(state.start);else state.startMarker=L.marker(state.start,{icon:startIcon,zIndexOffset:980}).addTo(map).bindPopup('Start');state.startMarker.bringToFront?.();updateRouteDebugUi();setStatus('Start valgt. Vælg slutpunkt.')}
-function setEnd(p){state.end={lat:p.lat,lng:p.lng};if(state.endMarker)state.endMarker.setLatLng(state.end);else state.endMarker=L.marker(state.end,{icon:endIcon,zIndexOffset:990}).addTo(map).bindPopup('Slut');state.endMarker.bringToFront?.();updateRouteDebugUi();setStatus(state.trollingEnabled?'Slut valgt. Lav trollingrute på DDM-dybdekurven.':'Slut valgt. Lav fri rute efter valgt dybde.')}
+function updateStartEndTileDebug(){
+ const grid=state.depthGrid||(state.tileManifest?buildVirtualTileGrid(state.tileManifest):null);
+ state.routeDebug.startTile=state.start?tileIdForLatLng(state.start,grid):null;
+ state.routeDebug.endTile=state.end?tileIdForLatLng(state.end,grid):null;
+}
+function setStart(p){state.start={lat:p.lat,lng:p.lng};if(state.startMarker)state.startMarker.setLatLng(state.start);else state.startMarker=L.marker(state.start,{icon:startIcon,zIndexOffset:980}).addTo(map).bindPopup('Start');state.startMarker.bringToFront?.();updateStartEndTileDebug();updateRouteDebugUi();setStatus('Start valgt. Vælg slutpunkt.')}
+function setEnd(p){state.end={lat:p.lat,lng:p.lng};if(state.endMarker)state.endMarker.setLatLng(state.end);else state.endMarker=L.marker(state.end,{icon:endIcon,zIndexOffset:990}).addTo(map).bindPopup('Slut');state.endMarker.bringToFront?.();updateStartEndTileDebug();updateRouteDebugUi();setStatus(state.trollingEnabled?'Slut valgt. Lav trollingrute på DDM-dybdekurven.':'Slut valgt. Lav fri rute efter valgt dybde.')}
 function useGpsAsStart(){if(!state.gps)return setStatus('Mangler GPS-position');setTrollingMode(false,true);setStart(state.gps);panMapTo([state.gps.lat,state.gps.lng],'GPS som start')}
 function centerOnGps(){if(!state.gps)return setStatus('Mangler GPS-position');panMapTo([state.gps.lat,state.gps.lng],'Centrér GPS');setStatus('Kortet er centreret på aktuel GPS-position.');applyMapOrientation(true)}
 function followGpsNow(){if(!state.gps)return setStatus('Mangler GPS-position');enableFollowGps('Følg GPS');followBoat(true);setStatus('Følg GPS er aktiv. Kortet følger bådens GPS-position.')}
@@ -452,7 +457,7 @@ function visibleDdmTileText(){
 }
 function mainRoutingStatus(){
  if(state.routingBusy)return{text:'beregner',cls:'warn'};
- if(state.routeDebug.lastError||state.manifestStatus==='error')return{text:'fejl',cls:'bad'};
+ if(state.routeDebug.lastError||state.manifestStatus==='error')return{text:state.routeDebug.routingStopReason||state.routeDebug.lastError||'fejl',cls:'bad'};
  return{text:'klar',cls:'ok'};
 }
 function updateMainRouteStatusUi(){
@@ -682,6 +687,44 @@ function expectedTileIdForPoint(p,grid=state.depthGrid){
   if(meta?.id)return meta.id;
  }
  return id;
+}
+function depthTileHasData(tile){
+ if(!tile?.data?.length)return false;
+ for(const row of tile.data||[])for(const d of row||[])if(typeof d==='number'&&Number.isFinite(d))return true;
+ return false;
+}
+function tileRuntimeDebug(id,extra={}){
+ const meta=id?state.tileById.get(id):null;
+ const file=meta?.depthFile||extra.file||null;
+ const loaded=id?state.loadedDepthTiles.get(id):null;
+ const loading=id?state.loadingDepthTiles.has(id):false;
+ const err=id?[...state.tileErrors].reverse().find(e=>e.id===id&&e.type==='depth'):null;
+ const contains=loaded?depthTileHasData(loaded):false;
+ return{
+  tileId:id||'-',
+  expectedFile:file||'-',
+  actualFile:file?tileUrl(file):'-',
+  inManifest:!!meta,
+  fetched:loaded?'ja':loading?'henter':err?`fejl: ${err.status}`:'nej',
+  loaded:!!loaded,
+  loading,
+  fetchError:err?.status||null,
+  containsDepthData:contains,
+  depthSummary:loaded?`${contains?'ja':'nej'} · ${loaded.validCells||0} valid / ${loaded.waterCells||0} water`:meta?`ikke loaded · manifest ${meta.validCells||0} valid / ${meta.waterCells||0} water`:'nej',
+  validCells:loaded?.validCells??meta?.validCells??0,
+  waterCells:loaded?.waterCells??meta?.waterCells??0
+ };
+}
+function tileIdForLatLng(p,grid=state.depthGrid){
+ return expectedTileIdForPoint(p,grid||(state.tileManifest?buildVirtualTileGrid(state.tileManifest):null));
+}
+function tileIdForGridCell(grid,r,c){
+ if(!grid?.mode||grid.mode!=='tiles')return null;
+ const tileSize=state.tileManifest?.grid?.tileSize||grid.tileSize;
+ return tileSize?tileIdForCell(r,c,tileSize):null;
+}
+function firstRelevantDebugTile(){
+ return state.routeDebug.firstMissingTile||state.routeDebug.firstFailingTile||state.routeDebug.firstInvalidDepthTile||state.routeDebug.startTile||state.routeDebug.endTile||null;
 }
 function ensureDepthTileForPoint(p){
  if(!state.tileManifest||!p)return;
@@ -988,8 +1031,32 @@ function pruneTileMap(mapRef,max,retainIds){
  const removable=[...mapRef.entries()].filter(([id])=>!retainIds.has(id)).sort((a,b)=>(a[1].lastUsed||0)-(b[1].lastUsed||0));
  while(mapRef.size>max&&removable.length){
   const [id]=removable.shift();
-  mapRef.delete(id);
+ mapRef.delete(id);
  }
+}
+function updateRoutingTileDebug(start,end,tiles=[]){
+ const startTile=tileIdForLatLng(start,state.depthGrid||(state.tileManifest?buildVirtualTileGrid(state.tileManifest):null));
+ const endTile=tileIdForLatLng(end,state.depthGrid||(state.tileManifest?buildVirtualTileGrid(state.tileManifest):null));
+ Object.assign(state.routeDebug,{
+  startTile:startTile||'-',
+  endTile:endTile||'-',
+  inspectedTileCount:Array.isArray(tiles)?tiles.length:0,
+  firstFailingTile:null,
+  firstMissingTile:null,
+  firstInvalidDepthTile:null,
+  routingStopReason:null,
+  tileDebug:null
+ });
+ updateRouteDebugUi();
+}
+function setRoutingTileFailure(kind,tileId,reason,extra={}){
+ const id=tileId||'-';
+ if(kind==='missing'&&!state.routeDebug.firstMissingTile)state.routeDebug.firstMissingTile=id;
+ if(kind==='invalidDepth'&&!state.routeDebug.firstInvalidDepthTile)state.routeDebug.firstInvalidDepthTile=id;
+ if(!state.routeDebug.firstFailingTile)state.routeDebug.firstFailingTile=id;
+ if(reason)state.routeDebug.routingStopReason=reason;
+ state.routeDebug.tileDebug=tileRuntimeDebug(id,extra);
+ updateRouteDebugUi();
 }
 
 async function prepareRoutingGrid(start,end){
@@ -999,13 +1066,19 @@ async function prepareRoutingGrid(start,end){
  state.lastTileLoadError=null;
  state.routingTileIds=new Set();
  state.depthGrid=buildVirtualTileGrid(state.tileManifest);
- if(!pointInsideGrid(start,state.depthGrid)||!pointInsideGrid(end,state.depthGrid)){state.lastTileLoadError='Mangler DDM tiles: start/slut ligger uden for installeret DDM-område.';return false;}
+ updateRoutingTileDebug(start,end,[]);
+ if(!pointInsideGrid(start,state.depthGrid)){state.lastTileLoadError='Startpunkt udenfor DDM-dækning';state.routeDebug.routingStopReason=state.lastTileLoadError;updateRouteDebugUi();return false;}
+ if(!pointInsideGrid(end,state.depthGrid)){state.lastTileLoadError='Slutpunkt udenfor DDM-dækning';state.routeDebug.routingStopReason=state.lastTileLoadError;updateRouteDebugUi();return false;}
  const pad=Math.min(1.1,Math.max(0.18,directNm(start,end)/120));
  const bounds=boundsFromPoints([start,end],pad);
  const tiles=tilesForBounds(bounds);
- if(!tiles.length){state.lastTileLoadError='Mangler DDM tiles';return false;}
+ updateRoutingTileDebug(start,end,tiles);
+ if(!tiles.length){state.lastTileLoadError='Mangler DDM tiles';state.routeDebug.routingStopReason=state.lastTileLoadError;updateRouteDebugUi();return false;}
  const ids=new Set(tiles.map(tile=>tile.id));
  state.routingTileIds=ids;
+ state.routeDebug.routingTileCount=ids.size;
+ state.routeDebug.inspectedTileCount=tiles.length;
+ updateRouteDebugUi();
  const tracker=hasPendingTileLoads(ids,{depth:true})?beginTileProgress():null;
  await waitForProgressPaint(tracker);
  try{
@@ -1014,6 +1087,8 @@ async function prepareRoutingGrid(start,end){
  console.error(e);
   if(tracker)finishTileProgress(tracker);
   state.lastTileLoadError=tileFailureMessage();
+  const failedId=state.lastTileError?.id||null;
+  if(failedId)setRoutingTileFailure('missing',failedId,`Mangler tile ${failedId}`,{file:state.lastTileError?.file});
   setStatus(state.lastTileLoadError);
   return false;
  }
@@ -1534,6 +1609,21 @@ function updateRouteDebugUi(){
  if($('routeDebugResolution'))$('routeDebugResolution').textContent=state.routeDebug.gridResolutionM?`${Math.round(state.routeDebug.gridResolutionM)} m`:'-';
  if($('routeDebugVisited'))$('routeDebugVisited').textContent=String(state.routeDebug.visitedCells||0);
  if($('routeDebugTiles'))$('routeDebugTiles').textContent=String(state.routeDebug.routingTileCount||0);
+ if($('routeDebugStartTile'))$('routeDebugStartTile').textContent=state.routeDebug.startTile||'-';
+ if($('routeDebugEndTile'))$('routeDebugEndTile').textContent=state.routeDebug.endTile||'-';
+ if($('routeDebugInspectedTiles'))$('routeDebugInspectedTiles').textContent=String(state.routeDebug.inspectedTileCount||state.routeDebug.routingTileCount||0);
+ if($('routeDebugFirstFailingTile'))$('routeDebugFirstFailingTile').textContent=state.routeDebug.firstFailingTile||'-';
+ if($('routeDebugFirstMissingTile'))$('routeDebugFirstMissingTile').textContent=state.routeDebug.firstMissingTile||'-';
+ if($('routeDebugFirstInvalidDepthTile'))$('routeDebugFirstInvalidDepthTile').textContent=state.routeDebug.firstInvalidDepthTile||'-';
+ if($('routeDebugStopReason'))$('routeDebugStopReason').textContent=state.routeDebug.routingStopReason||state.routeDebug.lastError||'-';
+ const relevantTile=firstRelevantDebugTile();
+ const tileDebug=state.routeDebug.tileDebug||(relevantTile?tileRuntimeDebug(relevantTile):null);
+ if($('routeDebugTileDebug'))$('routeDebugTileDebug').textContent=tileDebug?.tileId||'-';
+ if($('routeDebugTileExpectedFile'))$('routeDebugTileExpectedFile').textContent=tileDebug?.expectedFile||'-';
+ if($('routeDebugTileActualFile'))$('routeDebugTileActualFile').textContent=tileDebug?.actualFile||'-';
+ if($('routeDebugTileManifest'))$('routeDebugTileManifest').textContent=tileDebug?tileDebug.inManifest?'Ja':'Nej':'-';
+ if($('routeDebugTileFetched'))$('routeDebugTileFetched').textContent=tileDebug?.fetched||'-';
+ if($('routeDebugTileDepthData'))$('routeDebugTileDepthData').textContent=tileDebug?.depthSummary||'-';
  if($('routeDebugComplete'))$('routeDebugComplete').textContent=state.routeDebug.routeComplete?'Ja':'Nej';
  if($('routeDebugFallback'))$('routeDebugFallback').textContent=state.routeDebug.fallbackUsed?'Ja':'Nej';
  if($('routeDebugLayer'))$('routeDebugLayer').textContent=state.routeDebug.layerVisible?'Ja':'Nej';
@@ -1553,10 +1643,44 @@ function logRoutingSuccess(route,mode){
  console.info('WaterNav routing success',{mode,routingSource:route.stats?.routingSource||'DDM grid',fallbackUsed:route.stats?.fallbackUsed===true,routePointCount:route.points.length,routeDistanceNm:Number(route.lengthNm.toFixed(3)),visitedCells:route.stats?.visitedCells||0,routingTiles:route.stats?.routingTileCount||0,gridResolutionM:route.stats?.gridResolutionM||0,reachedDestination:route.stats?.reachedDestination===true||routeComplete,routeComplete,lastDistanceNm:route.stats?.lastDistanceNm,originalRoutePoints:route.stats?.originalPointCount||route.points.length,smoothedRoutePoints:route.stats?.smoothedPointCount||route.points.length,smoothingReductionPct:route.stats?.smoothingReductionPct||0,smoothingMode:route.stats?.smoothingMode||state.routeSmoothing,smoothingSplineUsed:route.stats?.smoothingSplineUsed===true,smoothingFallback:route.stats?.smoothingFallback===true,layerVisible:routeLayerVisible(),bounds:state.routeBounds});
 }
 
+function tileIdFromText(text){
+ const m=String(text||'').match(/\br\d{2}_c\d{2}\b/);
+ return m?m[0]:null;
+}
+function concreteRoutingFailureMessage(message,extra={}){
+ const tileId=extra.firstMissingTile||extra.firstFailingTile||extra.firstInvalidDepthTile||tileIdFromText(message);
+ if(tileId){
+  const debug=extra.tileDebug||tileRuntimeDebug(tileId);
+  if(!debug.inManifest)return`Mangler tile ${tileId} i manifest`;
+  if(!debug.expectedFile||debug.expectedFile==='-')return`Mangler depth-fil for tile ${tileId}`;
+  if(debug.fetchError)return`Mangler tile ${tileId}: ${debug.fetchError}`;
+  if(String(message||'').includes('Mangler DDM-data')){
+   if(!debug.loaded)return`Mangler tile ${tileId}`;
+   return`Ingen dybdedata i tile ${tileId}`;
+  }
+  if(!debug.loaded)return`Mangler tile ${tileId}`;
+  if(!debug.containsDepthData)return`Ingen dybdedata i tile ${tileId}`;
+  if(String(message||'').includes('under minimumsdybde'))return`Tile ${tileId}: under minimumsdybde`;
+  return`Tile ${tileId}: ${message||'routing stoppede'}`;
+ }
+ if(String(message||'').includes('ikke tæt på sejlbart DDM-vand'))return message;
+ if(String(message||'').includes('udenfor DDM-dækning'))return message;
+ if(String(message||'').includes('Ingen sikker vandrute'))return'Ingen sammenhængende vandrute fundet';
+ return message||'Routing stoppede uden konkret årsag';
+}
 function handleRoutingFailure(message,extra={}){
- const concrete=message||'Ingen vandrute fundet';
- setRoutingDebug('Routing fejlede',concrete,0,0,{routingSource:extra.routingSource||'DDM grid',fallbackUsed:extra.fallbackUsed===true,routeComplete:false,originalPointCount:0,smoothedPointCount:0,smoothingReductionPct:0,smoothingMode:'off',smoothingSplineUsed:false,smoothingFallback:false,...clearInvalidSegmentStats(),...extra});
- console.warn('WaterNav routing failure',{message:concrete,start:state.start,end:state.end,startNode:state.routeDebug.startNode,destinationNode:state.routeDebug.destinationNode,reachedDestination:state.routeDebug.reachedDestination,lastPoint:state.routeDebug.lastPoint,lastDistanceNm:state.routeDebug.lastDistanceNm,routePointCount:state.routeDebug.pointCount,visitedCells:state.routeDebug.visitedCells,routingTiles:state.routeDebug.routingTileCount,fallbackUsed:state.routeDebug.fallbackUsed,invalidSegmentIndex:state.routeDebug.invalidSegmentIndex,invalidSegmentStart:state.routeDebug.invalidSegmentStart,invalidSegmentEnd:state.routeDebug.invalidSegmentEnd,invalidPoint:state.routeDebug.invalidPoint,invalidDepth:state.routeDebug.invalidDepth,invalidReason:state.routeDebug.invalidReason,loadedDepthTiles:state.loadedDepthTiles.size,failedTiles:state.failedTileCount});
+ const preservedTileFailure={
+  firstFailingTile:state.routeDebug.firstFailingTile,
+  firstMissingTile:state.routeDebug.firstMissingTile,
+  firstInvalidDepthTile:state.routeDebug.firstInvalidDepthTile,
+  routingStopReason:state.routeDebug.routingStopReason,
+  tileDebug:state.routeDebug.tileDebug
+ };
+ const merged={...clearInvalidSegmentStats(),...preservedTileFailure,...extra};
+ const concrete=concreteRoutingFailureMessage(message,merged);
+ const debugTile=merged.tileDebug||tileRuntimeDebug(merged.firstMissingTile||merged.firstFailingTile||merged.firstInvalidDepthTile||tileIdFromText(concrete));
+ setRoutingDebug('Routing fejlede',concrete,0,0,{routingSource:merged.routingSource||'DDM grid',fallbackUsed:merged.fallbackUsed===true,routeComplete:false,originalPointCount:0,smoothedPointCount:0,smoothingReductionPct:0,smoothingMode:'off',smoothingSplineUsed:false,smoothingFallback:false,...merged,routingStopReason:concrete,tileDebug:debugTile});
+ console.warn('WaterNav routing failure',{message:concrete,start:state.start,end:state.end,startTile:state.routeDebug.startTile,endTile:state.routeDebug.endTile,inspectedTiles:state.routeDebug.inspectedTileCount,firstFailingTile:state.routeDebug.firstFailingTile,firstMissingTile:state.routeDebug.firstMissingTile,firstInvalidDepthTile:state.routeDebug.firstInvalidDepthTile,routingStopReason:state.routeDebug.routingStopReason,tileDebug:state.routeDebug.tileDebug,startNode:state.routeDebug.startNode,destinationNode:state.routeDebug.destinationNode,reachedDestination:state.routeDebug.reachedDestination,lastPoint:state.routeDebug.lastPoint,lastDistanceNm:state.routeDebug.lastDistanceNm,routePointCount:state.routeDebug.pointCount,visitedCells:state.routeDebug.visitedCells,routingTiles:state.routeDebug.routingTileCount,fallbackUsed:state.routeDebug.fallbackUsed,invalidSegmentIndex:state.routeDebug.invalidSegmentIndex,invalidSegmentStart:state.routeDebug.invalidSegmentStart,invalidSegmentEnd:state.routeDebug.invalidSegmentEnd,invalidPoint:state.routeDebug.invalidPoint,invalidDepth:state.routeDebug.invalidDepth,invalidReason:state.routeDebug.invalidReason,loadedDepthTiles:state.loadedDepthTiles.size,failedTiles:state.failedTileCount});
  setStatus(concrete);
  return false;
 }
@@ -1569,7 +1693,7 @@ function buildWaterRoute(start,end,opts){
  if(!eCell)return{ok:false,message:'Ingen sikker vandrute fundet: slutpunktet ligger ikke tæt på sejlbart DDM-vand.'};
  const search=aStarGrid(sCell,eCell,opts);
  const baseStats=routingBaseStats(opts,sCell,eCell,search);
- if(!search.reached||!search.path||search.path.length<2)return{ok:false,message:`Ingen sikker vandrute fundet med minimum ${Number(opts.minDepth||0).toFixed(1)} m. Prøv lavere minimumsdybde eller flyt start/slut til dybere vand.`,stats:baseStats};
+ if(!search.reached||!search.path||search.path.length<2)return{ok:false,message:search.stopReason||`Ingen sikker vandrute fundet med minimum ${Number(opts.minDepth||0).toFixed(1)} m. Prøv lavere minimumsdybde eller flyt start/slut til dybere vand.`,stats:baseStats};
  const path=search.path;
  const rawPts=path.map(cellToLatLng);
  const validation=validateCompleteRouteOutput(start,end,path,rawPts,opts,search);
@@ -1678,7 +1802,8 @@ function validateSmoothedRouteOutput(start,end,points,opts){
 }
 
 function routingBaseStats(opts,startCell,endCell,search=null){
- return{routingSource:'DDM grid',fallbackUsed:false,routingMode:opts.mode||'unknown',gridResolutionM:gridResolutionMeters(),routingTileCount:state.routingTileIds.size,visitedCells:search?.visitedCount||0,startNode:{r:startCell.r,c:startCell.c},destinationNode:{r:endCell.r,c:endCell.c},reachedDestination:search?.reached===true,routeComplete:false,lastDistanceNm:Infinity};
+ const failed=search&&search.reached!==true;
+ return{routingSource:'DDM grid',fallbackUsed:false,routingMode:opts.mode||'unknown',gridResolutionM:gridResolutionMeters(),routingTileCount:state.routingTileIds.size,inspectedTileCount:search?.inspectedTileCount||state.routeDebug.inspectedTileCount||state.routingTileIds.size,visitedCells:search?.visitedCount||0,startNode:{r:startCell.r,c:startCell.c},destinationNode:{r:endCell.r,c:endCell.c},reachedDestination:search?.reached===true,routeComplete:false,lastDistanceNm:Infinity,firstFailingTile:failed?search?.firstFailingTile||null:null,firstMissingTile:failed?search?.firstMissingTile||null:null,firstInvalidDepthTile:failed?search?.firstInvalidDepthTile||null:null,routingStopReason:failed?search?.stopReason||null:null,tileDebug:failed?search?.tileDebug||null:null};
 }
 
 function gridResolutionMeters(){
@@ -1770,19 +1895,46 @@ function aStarGrid(start,end,opts){
  const came=new Map(),gScore=new Map([[startKey,0]]),closed=new Set();
  const targetDepth=opts.targetDepth,minDepth=opts.minDepth;
  const maxIter=rows*cols;
+ const inspectedTiles=new Set();
+ const failure={firstFailingTile:null,firstMissingTile:null,firstInvalidDepthTile:null,stopReason:null,tileDebug:null};
+ const noteCell=(r,c)=>{
+  const id=tileIdForGridCell(grid,r,c);
+  if(id)inspectedTiles.add(id);
+  return id;
+ };
+ const noteFailure=(probe,reason=null)=>{
+  const tileId=probe?.tileId||null;
+  if(tileId)inspectedTiles.add(tileId);
+  if(!tileId)return;
+  const text=reason||probe?.reason||'routing stoppede';
+  const missing=String(text).includes('Mangler DDM-data');
+  if(!failure.firstFailingTile)failure.firstFailingTile=tileId;
+  if(missing&&!failure.firstMissingTile)failure.firstMissingTile=tileId;
+  if(!missing&&!failure.firstInvalidDepthTile)failure.firstInvalidDepthTile=tileId;
+  if(!failure.stopReason)failure.stopReason=text;
+  if(!failure.tileDebug)failure.tileDebug=probe?.tileDebug||tileRuntimeDebug(tileId);
+ };
  let iter=0;
  while(open.size()&&iter++<maxIter){
   const cur=open.pop();
   if(closed.has(cur.key))continue;
-  if(cur.key===endKey)return{reached:true,path:reconstructPath(came,cur),visitedCount:closed.size+1,iterations:iter,startCell:start,endCell:end,lastNode:{r:cur.r,c:cur.c}};
+  noteCell(cur.r,cur.c);
+  if(cur.key===endKey)return{reached:true,path:reconstructPath(came,cur),visitedCount:closed.size+1,iterations:iter,startCell:start,endCell:end,lastNode:{r:cur.r,c:cur.c},inspectedTileCount:inspectedTiles.size};
   closed.add(cur.key);
   for(const nb of neighbors(cur.r,cur.c,rows,cols)){
    const nKey=nb.r+','+nb.c;if(closed.has(nKey))continue;
-   const d=depthAtCell(nb.r,nb.c);
-   if(!cellNavigable(nb.r,nb.c,opts))continue;
+   noteCell(nb.r,nb.c);
+   const probe=probeGridCell(grid,nb.r,nb.c,opts);
+   if(!probe.ok){noteFailure(probe);continue;}
+   const d=probe.depth;
+   if(!cellNavigable(nb.r,nb.c,opts)){noteFailure(probe,'land/ukendt DDM-data eller utilstrækkelig friholdelse');continue;}
    // Prevent diagonal squeezing through land, unknown depth, or too-shallow cells.
     if(nb.diag){
-     if(!cellNavigable(cur.r,nb.c,opts)||!cellNavigable(nb.r,cur.c,opts))continue;
+     const sideA=probeGridCell(grid,cur.r,nb.c,opts),sideB=probeGridCell(grid,nb.r,cur.c,opts);
+     if(!sideA.ok){noteFailure(sideA);continue;}
+     if(!sideB.ok){noteFailure(sideB);continue;}
+     if(!cellNavigable(cur.r,nb.c,opts)){noteFailure(sideA,'land/ukendt DDM-data eller utilstrækkelig friholdelse');continue;}
+     if(!cellNavigable(nb.r,cur.c,opts)){noteFailure(sideB,'land/ukendt DDM-data eller utilstrækkelig friholdelse');continue;}
     }
     if(opts.mode==='seaTrout'&&!transitionWaterClear({r:cur.r,c:cur.c},{r:nb.r,c:nb.c},opts))continue;
     let step=nb.diag?1.414:1;
@@ -1815,7 +1967,8 @@ function aStarGrid(start,end,opts){
    }
   }
  }
- return{reached:false,path:null,visitedCount:closed.size,iterations:iter,startCell:start,endCell:end,lastNode:null};
+ const stopReason=failure.stopReason||'Ingen sammenhængende vandrute fundet';
+ return{reached:false,path:null,visitedCount:closed.size,iterations:iter,startCell:start,endCell:end,lastNode:null,inspectedTileCount:inspectedTiles.size,...failure,stopReason};
 }
 function depthGradientAtCell(r,c){
  let min=Infinity,max=-Infinity,count=0;
@@ -1921,7 +2074,7 @@ function segmentWaterClearDetailed(a,b,opts,index=null){
   const t=i/n;
   const p={lat:a.lat+(b.lat-a.lat)*t,lng:a.lng+(b.lng-a.lng)*t};
   const probe=probeRoutePointWater(p,opts);
-  if(!probe.ok)return{ok:false,index,a,b,point:p,depth:probe.depth,reason:probe.reason,gridSource:probe.gridSource};
+  if(!probe.ok)return{ok:false,index,a,b,point:p,depth:probe.depth,reason:probe.reason,gridSource:probe.gridSource,tileId:probe.tileId,tileDebug:probe.tileDebug};
  }
  return{ok:true};
 }
@@ -1944,7 +2097,7 @@ function probeRoutePointInGrid(grid,p,opts){
  let min=Infinity;
  for(const cell of cells){
   const hit=probeGridCell(grid,cell.r,cell.c,opts);
-  if(!hit.ok)return{ok:false,depth:hit.depth,reason:hit.reason,gridSource:gridSourceLabel(grid)};
+  if(!hit.ok)return{ok:false,depth:hit.depth,reason:hit.reason,gridSource:gridSourceLabel(grid),tileId:hit.tileId,tileDebug:hit.tileDebug};
   min=Math.min(min,hit.depth);
  }
  return{ok:true,depth:min,reason:null,gridSource:gridSourceLabel(grid)};
@@ -1971,10 +2124,15 @@ function routePointCandidateCells(grid,p){
  return out;
 }
 function probeGridCell(grid,r,c,opts){
+ const tileId=tileIdForGridCell(grid,r,c);
+ const tileDebug=tileId?tileRuntimeDebug(tileId):null;
  const depth=depthAtGridCell(grid,r,c);
- if(!Number.isFinite(depth))return{ok:false,depth:NaN,reason:'land/ukendt DDM-data'};
- if(depth<Number(opts.minDepth||0))return{ok:false,depth,reason:'under minimumsdybde'};
- return{ok:true,depth,reason:null};
+ if(!Number.isFinite(depth)){
+  const reason=tileId&&!state.loadedDepthTiles.has(tileId)?`Mangler DDM-data i tile ${tileId}`:'land/ukendt DDM-data';
+  return{ok:false,depth:NaN,reason,tileId,tileDebug};
+ }
+ if(depth<Number(opts.minDepth||0))return{ok:false,depth,reason:'under minimumsdybde',tileId,tileDebug};
+ return{ok:true,depth,reason:null,tileId,tileDebug};
 }
 function depthAtGridCell(grid,r,c){
  if(!grid||r<0||c<0||r>=grid.rows||c>=grid.cols)return NaN;
@@ -2000,10 +2158,13 @@ function formatLatLng(p){
  return p&&Number.isFinite(p.lat)&&Number.isFinite(p.lng)?`${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`:'-';
 }
 function invalidSegmentStats(segment){
- return{invalidSegmentIndex:segment.index,invalidSegmentStart:segment.a||null,invalidSegmentEnd:segment.b||null,invalidPoint:segment.point||null,invalidDepth:Number.isFinite(segment.depth)?segment.depth:NaN,invalidReason:segment.reason||'land/ukendt DDM-data',invalidGridSource:segment.gridSource||'-'};
+ const tileId=segment.tileId||null;
+ const missingTile=tileId&&String(segment.reason||'').includes('Mangler DDM-data')?tileId:null;
+ const invalidDepthTile=tileId&&!missingTile?tileId:null;
+ return{invalidSegmentIndex:segment.index,invalidSegmentStart:segment.a||null,invalidSegmentEnd:segment.b||null,invalidPoint:segment.point||null,invalidDepth:Number.isFinite(segment.depth)?segment.depth:NaN,invalidReason:segment.reason||'land/ukendt DDM-data',invalidGridSource:segment.gridSource||'-',firstFailingTile:tileId,firstMissingTile:missingTile,firstInvalidDepthTile:invalidDepthTile,routingStopReason:segment.reason||'land/ukendt DDM-data',tileDebug:segment.tileDebug||tileRuntimeDebug(tileId)};
 }
 function clearInvalidSegmentStats(){
- return{invalidSegmentIndex:null,invalidSegmentStart:null,invalidSegmentEnd:null,invalidPoint:null,invalidDepth:null,invalidReason:null,invalidGridSource:null};
+ return{invalidSegmentIndex:null,invalidSegmentStart:null,invalidSegmentEnd:null,invalidPoint:null,invalidDepth:null,invalidReason:null,invalidGridSource:null,firstFailingTile:null,firstMissingTile:null,firstInvalidDepthTile:null,routingStopReason:null,tileDebug:null};
 }
 function samplePathDepths(points,opts){const out=[];for(let i=1;i<points.length;i++){const a=points[i-1],b=points[i];const dist=directNm(a,b);const n=Math.max(2,Math.ceil(dist*1852/12));for(let k=0;k<=n;k++){const t=k/n;const p={lat:a.lat+(b.lat-a.lat)*t,lng:a.lng+(b.lng-a.lng)*t};const probe=probeRoutePointWater(p,opts);if(probe.ok&&Number.isFinite(probe.depth))out.push(probe.depth)}}return out.length?out:points.map(depthAtLatLng).filter(Number.isFinite)}
 function simplifyWaterSafe(points,opts){
@@ -2088,7 +2249,7 @@ function clearRoute(){
  if(state.startMarker){map.removeLayer(state.startMarker);state.startMarker=null}
  if(state.endMarker){map.removeLayer(state.endMarker);state.endMarker=null}
  state.start=null;state.end=null;state.currentRoute=null;state.pickMode=null;
- setRoutingDebug('Rute ryddet',null,0,0,{originalPointCount:0,smoothedPointCount:0,smoothingReductionPct:0,smoothingMode:'off',smoothingSplineUsed:false,smoothingFallback:false,...clearInvalidSegmentStats()});
+ setRoutingDebug('Rute ryddet',null,0,0,{originalPointCount:0,smoothedPointCount:0,smoothingReductionPct:0,smoothingMode:'off',smoothingSplineUsed:false,smoothingFallback:false,startTile:null,endTile:null,inspectedTileCount:0,routingTileCount:0,...clearInvalidSegmentStats()});
  updateInfoBox();updateRouteActionButtons();
  $('routeLength').textContent='—';
  setStatus('Aktiv rute og navigation er ryddet. Hjemhavn, settings og gemte ruter er bevaret.');
